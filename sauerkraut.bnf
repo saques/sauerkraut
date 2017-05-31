@@ -1,0 +1,13 @@
+<program> ::= <expression> | <expression> <program>
+<expression> ::= <declaration> | <instruction> 
+<declaration> ::= <variable> | <function>
+<variable> ::= "var" <whitespace> <identifier> <assignment> | "var" <whitespace> <identifier>
+<function> ::= "function" <whitespace> <identifier> <arguments> <codeblock>
+<whitespace> ::= " "
+<assignment> ::= <equals> <value>
+<equals> ::= "="
+<value> ::= <number> | <string> | <array> | <object>
+<arguments> ::= "(" <argument> ")" | "()"
+<argument> ::= <identifier> "," <argument> | <identifier>
+
+
