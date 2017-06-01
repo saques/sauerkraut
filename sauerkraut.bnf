@@ -1,13 +1,31 @@
-<program> ::= <expression> | <expression> <program>
-<expression> ::= <declaration> | <instruction> 
-<declaration> ::= <variable> | <function>
-<variable> ::= "var" <whitespace> <identifier> <assignment> | "var" <whitespace> <identifier>
-<function> ::= "function" <whitespace> <identifier> <arguments> <codeblock>
-<whitespace> ::= " "
-<assignment> ::= <equals> <value>
-<equals> ::= "="
-<value> ::= <number> | <string> | <array> | <object>
-<arguments> ::= "(" <argument> ")" | "()"
-<argument> ::= <identifier> "," <argument> | <identifier>
+<program>          ::= <expression> | <expression> <program>
+<expression>       ::= <declaration> | <instruction> 
+<declaration>      ::= <variable> | <function>
+<variable>         ::= <varkw> <whitespace> <identifier> <assignment> | <varkw> <whitespace> <identifier>
+<function>         ::= <funckw> <whitespace> <identifier> <commontofunc>
+<commontofunc>     ::= <arguments> <codeblock>
+<anonymousfunc>    ::= <anonfunckw> <commontofunc>
+<varkw>            ::= "var"
+<funckw>           ::= "function"
+<anonfunckw>       ::= "@"
+<whitespace>       ::= " "
+<assignment>       ::= <equals> <value>
+<equals>           ::= "="
+<value>            ::= <number> | <string> | <array> | <object> | <anonymousfunc>
+<array>            ::= "[" <values> "]" | "[ ]"
+<values>           ::= <value> "," <values> | <value>
+<object>           ::= "{" <objmembers> "}" | "{ }"
+<objmembers>       ::= <keyval> "," <objmembers> | <keyval> 
+<keyval>           ::= <identifier> ":" <value>
+<arguments>        ::= "(" <argument> ")" | "()"
+<argument>         ::= <identifier> "," <argument> | <identifier>
+<codeblock>        ::= <expression> <codeblock> | <end>
+<end>              ::= "end"
 
-
+/*
+ *
+ * TODO:
+ * + Instructions
+ * + Identifiers
+ *
+ */
