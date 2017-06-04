@@ -12,6 +12,7 @@ typedef Object * (*function)(void**,int);
  */
 typedef struct Method {
 	function f;
+	const char * name;
 } Method;
 
 Method * newMethod(function f);
