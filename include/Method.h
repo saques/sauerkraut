@@ -15,6 +15,8 @@ typedef struct Method {
 	const char * name;
 } Method;
 
-Method * newMethod(function f);
+Class * methodClass();
+
+Method * newMethod(function f, const char * name);
 
 #ENDIF

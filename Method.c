@@ -1,20 +1,31 @@
 #include <Method.h>
 #include <Class.h>
+#include <string.h>
+#include <stdio.h>
 
 /*
  * METHODS FOR Method
+ * Last argument (args[nArgs])
+ * is the Method instance.
+ * 
+ * Dimension of 'args' is assured
+ * to be nArgs+1 by _funcexec function below
  */
-void * execute(Method * f, void** args, int nArgs){
+ 
+const static int NMETHODS = 1;
+ 
+//[args(0)...args(nArgs-1),this]
+void * execute(void** args, int nArgs){
+	Method * f = (Method *)args[nArgs];
 	return f->f(args,nArgs);
 }
+
 /*
  * END METHODS FOR Method
  */
  
  
 /*
- * PSEUDOCODE:
- * 
  * This is what is called when a function token
  * has been detected.
  * 
@@ -43,11 +54,18 @@ void * execute(Method * f, void** args, int nArgs){
  */  
 void * _funcexec(Object * o, const char * name, void ** args, int nArgs){
 	Class * c = o->class;
-	for(Method * m in Class->Methods){
-		if(m.name.equals(name)){
-			return m->f(o,args,nArgs);
+	for(int i=0; i<c->nMethods; i++){
+		if(strcmp(name,c->methods[i])==0){
+			void ** cArgs = realloc(args, sizeof(void *)(nArgs + 1));
+			cArgs[nArgs] = (void *)o;
+			return c->methods[i]->f(cArgs,nArgs);
 		}
-	} 
+	}
+	/*
+	 * No method has matched
+	 */
+	fprintf(stderr,"No method with name %s has been found\n",name);
+	exit(1);
 }
 
 /*
@@ -56,9 +74,9 @@ void * _funcexec(Object * o, const char * name, void ** args, int nArgs){
  * should be maintained.
  */
 Class * methodClass(){
-	Method ** m = (Method **)malloc(sizeof(Method *)*1);
-	m[0] = (function)execute;
-	return newClass(METHOD,m,1);
+	Method ** m = (Method **)malloc(sizeof(Method *)*NMETHODS);
+	m[0] = newMethod((function)execute,"execute");
+	return newClass(METHOD,m,NMETHODS);
 }
 
 Method * newMethod(function f, const char * name){

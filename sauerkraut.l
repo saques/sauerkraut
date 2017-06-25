@@ -1,5 +1,6 @@
 %{
 #include "y.tab.h"
+#include <stdlib.h>
 %}
 
 L	[a-zA-Z_]
@@ -11,9 +12,9 @@ D	[0-9]
 var			return VARKW;
 function		return FUNKW;
 end			return END;
-{L}({L}|{D})*		return ID;
-[+-]?{D}+		return INTEGER;
-L?\"(\\.|[^\\"])*\"	return STRING;
+{L}({L}|{D})*		yylval.s = yytext; return ID;
+[+-]?{D}+		yylval.i = atoi(yytext); return INTEGER;
+L?\"(\\.|[^\\"])*\"	yylval.s = yytext; return STRING;
 "<="			return LE;
 ">="			return GE;
 "=="			return EQ;

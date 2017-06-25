@@ -1,7 +1,7 @@
 #IFNDEF OBJECT_H
 #DEFINE OBJECT_H
 
-#include Class.h
+#include "Class.h"
 
 /*
  * Variables must be assigned
@@ -10,7 +10,7 @@
  * The idea is to have a sort
  * of Map<Identifier,Object>
  * that can be dynamically 
- * modified. Assugnments should
+ * modified. Assignments should
  * be represented in said map.
  * 
  * 'instance' points to one
@@ -19,7 +19,7 @@
  *  + Integer
  *  + String
  *  + Array
- *  + Object
+ *  + KVObject(As in javascript)
  *  + Method
  */ 
 typedef struct Object {
@@ -27,5 +27,9 @@ typedef struct Object {
 	Class * class;
 } Object;
 
+/*
+ * Usage:
+ * newObject(newInteger(5),integerClass);
+ */
 Object * newObject(void * instance, Class * class);
 #ENDIF
