@@ -1,5 +1,5 @@
-{
+var obj = {
 	hola:"esto";
 	es:55;
 	un: {objeto:[];};
-}
+};
