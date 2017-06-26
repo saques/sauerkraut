@@ -1,11 +1,13 @@
 %{
-#include "y.tab.h"
+#include "node.h"
+#include "sauerkraut.hpp"
 #include <stdlib.h>
 %}
 
 L	[a-zA-Z_]
 D	[0-9]
-
+%option noyywrap
+%option yylineno
 %%
 
 [\t \n]

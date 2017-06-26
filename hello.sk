@@ -1,0 +1,8 @@
+var a = 10
+
+function holaMundo(a) {
+	var b = 10
+	a = b + a;
+}
+
+

@@ -3,3 +3,8 @@ sauerkraut
 y.tab.c
 y.tab.h
 y.output
+*.o
+*.ll
+tokens.cpp
+sauerkraut.cpp
+sauerkraut.hpp
