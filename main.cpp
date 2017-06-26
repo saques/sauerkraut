@@ -1,6 +1,7 @@
 #include <iostream>
 #include "node.h"
 #include "codegen.h"
+#include "corefn.h"
 #include "string.h"
 #include <fstream>
 #include <iostream>
@@ -18,7 +19,7 @@ OutputFilename("o", cl::desc("Output filename"), cl::value_desc("filename"));
 
 int main(int argc, char **argv)
 {
-	cl::ParseCommandLineOptions(argc, argv, " BrainF compiler\n");
+	cl::ParseCommandLineOptions(argc, argv, " Sauerkraut compiler\n");
 	bool run = false;
 	bool llvms = false;
 	for (int i = 0; i < argc; i++) {
@@ -44,7 +45,7 @@ int main(int argc, char **argv)
 	InitializeNativeTargetAsmPrinter();
 	InitializeNativeTargetAsmParser();
 	CodeGenContext context;
-	// createCoreFunctions(context);
+	createCoreFunctions(context);
 	raw_ostream *out = &outs();
 	if (OutputFilename == "") {
 		OutputFilename = "output.ll";

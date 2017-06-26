@@ -3,7 +3,8 @@ all: sauerkraut
 OBJS = sauerkraut.o  \
 		tokens.o \
 		main.o \
-		codegen.o
+		codegen.o \
+		corefn.o
 
 LLVMCONFIG = llvm-config
 CPPFLAGS = `$(LLVMCONFIG) --cppflags` -std=c++11
