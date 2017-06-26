@@ -1,9 +1,8 @@
 #ifndef CLASS_H
 #define CLASS_H
 
-#include "Method.h"
-#include "Object.h"
-
+#include <Object.h>
+typedef struct Object Object;
 
 const char INTEGER[] = "INTEGER";
 const char STRING[] = "STRING";
@@ -12,8 +11,9 @@ const char OBJECT[] = "OBJECT";
 const char METHOD[] = "METHOD";
 
 
+
 typedef struct Class {
-	char * name;
+	const char * name;
 	Object ** methods;
 	int nMethods;
 } Class;

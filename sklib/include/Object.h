@@ -1,7 +1,8 @@
 #ifndef OBJECT_H
 #define OBJECT_H
 
-#include "Class.h"
+#include <Class.h>
+typedef struct Class Class;
 
 /*
  * Variables must be assigned

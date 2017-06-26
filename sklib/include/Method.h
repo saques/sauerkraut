@@ -1,8 +1,8 @@
 #ifndef METHOD_H
 #define METHOD_H
 
-#include "Object.h"
-#include "Class.h"
+#include <Object.h>
+#include <Class.h>
 
 
 typedef Object * (*function)(void**,int);

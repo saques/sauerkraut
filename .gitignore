@@ -8,3 +8,4 @@ y.tab.h
 tokens.cpp
 sauerkraut.cpp
 sauerkraut.hpp
+*.a

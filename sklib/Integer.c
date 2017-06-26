@@ -5,11 +5,11 @@
 #include <String.h>
 #include <Object.h>
 #include <stdlib.h>
+#include <stdio.h>
 #define BUFSIZE 16
-#define NULL 0
 
 
-const static Class * iClass = NULL;
+static Class * iClass = NULL;
 
 /*
  * METHODS FOR Integer
@@ -18,7 +18,7 @@ const static int NMETHODS = 6;
 
 //[this]
 Object * toString(void ** args, int nArgs){
-	Integer * other = (Integer *)(((Object *)args[nArgs])->instance);
+	Integer * this = (Integer *)(((Object *)args[nArgs])->instance);
 	char * s = malloc(BUFSIZE);
 	snprintf(s,BUFSIZE,"%d",this->i);
 	return newObject(newString(s),stringClass());
@@ -83,7 +83,7 @@ Class * integerClass(){
 	}
 	iClass = newClass(INTEGER,NMETHODS);
 	
-	iClass->methods[0] = newObject(newMethod((function)add,"add"),methodClass());
+	iClass->methods[0] = newObject(newMethod((function)sum,"sum"),methodClass());
 	iClass->methods[1] = newObject(newMethod((function)subtract,"subtract"),methodClass());
 	iClass->methods[2] = newObject(newMethod((function)multiply,"multiply"),methodClass());
 	iClass->methods[3] = newObject(newMethod((function)divide,"divide"),methodClass());
