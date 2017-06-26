@@ -2,7 +2,7 @@ lex.yy.c
 sauerkraut
 y.tab.c
 y.tab.h
-y.output
+*.output
 *.o
 *.ll
 tokens.cpp
