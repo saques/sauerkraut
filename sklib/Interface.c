@@ -3,20 +3,20 @@
 #include <Integer.h>
 #include <String.h>
 
-void * newInteger(int i){
+void * newIntegerObj(int i){
 	return (void *)newObject(newInteger(i),integerClass());
 }
 
-void * newString(const char * s){
+void * newStringObj(const char * s){
 	return (void *)newObject(newString(s),stringClass());
 }
 
-void * newKVObject(char ** keys, void ** vals, int n){
+void * newKVObjectObj(char ** keys, void ** vals, int n){
 	//TODO
 	return 0;
 }
 
-void * newArray(void ** vals, int n){
+void * newArrayObj(void ** vals, int n){
 	//TODO
 	return 0;
 }

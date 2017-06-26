@@ -3,9 +3,9 @@
 #include <Object.h>
 #include <string.h>
 #include <stdio.h>
-#define NULL 0
+#include <stdlib.h>
 
-const static Class * mClass = NULL;
+static Class * mClass = NULL;
 
 /*
  * METHODS FOR Method
@@ -62,7 +62,7 @@ Object * _funcexec(Object * o, const char * name, void ** args, int nArgs){
 	for(int i=0; i<c->nMethods; i++){
 		m = (Method *)((Object *)c->methods[i])->instance;
 		if(strcmp(name,m->name)==0){
-			void ** cArgs = realloc(args, sizeof(void *)(nArgs + 1));
+			void ** cArgs = realloc(args, sizeof(void *)*(nArgs + 1));
 			cArgs[nArgs] = (void *)o;
 			return m->f(cArgs,nArgs);
 		}

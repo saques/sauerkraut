@@ -1,7 +1,7 @@
 #ifndef INTEGER_H
 #define INTEGER_H
 
-#include "Class.h"
+#include <Class.h>
 
 typedef struct Integer {
 	int i;

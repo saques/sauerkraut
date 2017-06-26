@@ -2,10 +2,10 @@
 #include <Class.h>
 #include <Method.h>
 #include <string.h>
-#define NULL 0
+#include <stdlib.h>
 
 
-const static Class * sClass = NULL;
+static Class * sClass = NULL;
 
 /*
  * METHODS FOR String
