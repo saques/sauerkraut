@@ -2,11 +2,16 @@
 #include <Class.h>
 #include <Method.h>
 #include <string.h>
+#define NULL 0
+
+
+const static Class * sClass = NULL;
 
 /*
  * METHODS FOR String
  */
 const static int NMETHODS = 5;
+
 //[this]
 Object * toString(void ** args, int nArgs){
 	return args[nArgs];
@@ -18,12 +23,17 @@ Object * toString(void ** args, int nArgs){
 
 
 Class * stringClass(){
-	Method ** m = (Method **)malloc(sizeof(Method *)*NMETHODS);
-	m[0] = newMethod((function)toString,"toString");
-	return newClass(METHOD,m,NMETHODS);
+	if(sClass!=NULL){
+		return sClass;
+	}
+	sClass = newClass(STRING,NMETHODS);
+	
+	sClass->methods[0] = newObject(newMethod((function)toString,"toString"),methodClass());
+	
+	return sClass;
 }
 
-Method * newInteger(const char * s){
+String * newString(const char * s){
 	String * ans = (String *)malloc(sizeof(String));
 	ans->s=s;
 	return ans;

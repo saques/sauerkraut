@@ -20,4 +20,13 @@ Class * methodClass();
 
 Method * newMethod(function f, const char * name);
 
+/*
+ * Function that executes methods of a given object
+ * if the class of said object contains a method with
+ * the given name. Otherwise, exit(1).
+ * 
+ * INTERFACE METHOD
+ */
+Object * _funcexec(Object * o, const char * name, void ** args, int nArgs);
+
 #endif

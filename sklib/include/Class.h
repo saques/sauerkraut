@@ -2,7 +2,7 @@
 #define CLASS_H
 
 #include "Method.h"
-
+#include "Object.h"
 
 
 const char INTEGER[] = "INTEGER";
@@ -14,15 +14,14 @@ const char METHOD[] = "METHOD";
 
 typedef struct Class {
 	char * name;
-	/*
-	 * Method instances
-	 * should be singletons
-	 */
-	Method ** methods;
+	Object ** methods;
 	int nMethods;
 } Class;
 
-
-Class * newClass(const char * name, Method ** methods, int nmethods);
+/*
+ * Methods must be filled one by one in each
+ * new{Integer|String|KVObject|Array} function
+ */
+Class * newClass(const char * name, int nMethods);
 
 #endif

@@ -3,6 +3,9 @@
 #include <Object.h>
 #include <string.h>
 #include <stdio.h>
+#define NULL 0
+
+const static Class * mClass = NULL;
 
 /*
  * METHODS FOR Method
@@ -16,7 +19,7 @@
 const static int NMETHODS = 1;
  
 //[args(0)...args(nArgs-1),this]
-Object * execute(void** args, int nArgs){
+Object * execute(void ** args, int nArgs){
 	Method * f = (Method *)(((Object *)args[nArgs])->instance);
 	return f->f(args,nArgs);
 }
@@ -55,11 +58,13 @@ Object * execute(void** args, int nArgs){
  */  
 Object * _funcexec(Object * o, const char * name, void ** args, int nArgs){
 	Class * c = o->class;
+	Method * m = NULL;
 	for(int i=0; i<c->nMethods; i++){
-		if(strcmp(name,c->methods[i])==0){
+		m = (Method *)((Object *)c->methods[i])->instance;
+		if(strcmp(name,m->name)==0){
 			void ** cArgs = realloc(args, sizeof(void *)(nArgs + 1));
 			cArgs[nArgs] = (void *)o;
-			return c->methods[i]->f(cArgs,nArgs);
+			return m->f(cArgs,nArgs);
 		}
 	}
 	/*
@@ -75,9 +80,14 @@ Object * _funcexec(Object * o, const char * name, void ** args, int nArgs){
  * should be maintained.
  */
 Class * methodClass(){
-	Method ** m = (Method **)malloc(sizeof(Method *)*NMETHODS);
-	m[0] = newMethod((function)execute,"execute");
-	return newClass(METHOD,m,NMETHODS);
+	if(mClass!=NULL){
+		return mClass;
+	}
+	mClass = newClass(METHOD,NMETHODS);
+	
+	mClass->methods[0] = newObject(newMethod((function)execute,"execute"),mClass);
+	
+	return mClass;
 }
 
 Method * newMethod(function f, const char * name){

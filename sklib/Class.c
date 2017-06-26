@@ -1,10 +1,10 @@
 #include <stdlib.h>
 #include <Class.h>
 
-Class * newClass(const char * name, Method ** methods, int nMethods){
+Class * newClass(const char * name, int nMethods){
 	Class * ans = (Class *)malloc(sizeof(Class));
 	ans->name = name;
-	ans->methods = methods;
+	ans->methods = (Object **)malloc(sizeof(Object *)*nMethods);
 	ans->nMethods = nMethods;
 	return ans;
 }
