@@ -1,0 +1,3 @@
+extern function printi(a)
+
+printi(10)

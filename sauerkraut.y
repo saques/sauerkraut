@@ -32,16 +32,15 @@ void yyerror(const char * s){
 	int i;
 	char * s;
 }
-%token ID INTEGER STRING VARKW FUNKW END LE GE EQ NE OR AND WHILEKW
+%token ID INTEGER STRING VARKW FUNKW END LE GE EQ NE OR AND WHILEKW EXTERNKW
 
-%type <st>	    FUNC VAR EXPR
+%type <st>	    FUNC VAR EXPR EXTERN_FUNC
 %type <ident> 	IDENT
 %type <block> 	ST BLOCK
 %type <arg_list> ARGS ARGSET
-%type <expr>	INSTR VALUE INT
+%type <expr>	INSTR VALUE INT CALL
 %type <expr_list> PASSEDARGS
-
-%type <i> INTEGER STRING
+%type <i> INTEGER STRING EXTERN_FUNC_ARGS
 %type <s> ID
 
 %right "="
@@ -59,6 +58,11 @@ S		: ST
 		;
 
 ST		: EXPR ST
+		{
+			$$ = $2;
+			$2->statements.push_front($<st>1);
+		}
+		| EXTERN_FUNC ST
 		{
 			$$ = $2;
 			$2->statements.push_front($<st>1);
@@ -130,6 +134,26 @@ IDENT		: ID
 				$$ = new IdentifierNode($1);
 			}
 
+EXTERN_FUNC		: EXTERNKW FUNKW IDENT '(' EXTERN_FUNC_ARGS ')'
+				{
+					$$ = new ExternalFunctionDeclarationNode(*$3, $5);
+				}
+				| EXTERNKW FUNKW IDENT '(' ')'
+				{
+					$$ = new ExternalFunctionDeclarationNode(*$3, 0);
+				}
+				;
+
+EXTERN_FUNC_ARGS	: ID
+					{
+						$$ = 1;
+
+					}
+					| ID ',' EXTERN_FUNC_ARGS
+					{
+						$$ = 1 + $3;
+					}
+
 INT			: INTEGER
 			{
 				$$ = new IntegerNode($1);
@@ -137,12 +161,19 @@ INT			: INTEGER
 
 BLOCK		: EXPR  BLOCK | /*empty*/ ;
 
-INSTR		: ASSIGN ';'| CALL ';' | WHILE ;
+INSTR		: I | ASSIGN | CALL  | WHILE ;
 
 
 CALL		:  IDENT '(' PASSEDARGS ')'
-		 | IDENT '(' ')'
-                   ;
+			{
+				$$ = new FunctionCallNode(*$1, *$3);
+			}
+		 	| IDENT '(' ')'
+			{
+				ExpressionList *list = new ExpressionList();
+				$$ = new FunctionCallNode(*$1, *list);
+			}
+			;
 
 PASSEDARGS	:  INSTR ',' PASSEDARGS
 			{

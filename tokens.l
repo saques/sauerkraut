@@ -15,6 +15,7 @@ var			return VARKW;
 function		return FUNKW;
 end			return END;
 while			return WHILEKW;
+extern			return EXTERNKW;
 {L}({L}|{D})*		yylval.s = yytext; return ID;
 [+-]?{D}+		yylval.i = atoi(yytext); return INTEGER;
 L?\"(\\.|[^\\"])*\"	yylval.s = yytext; return STRING;

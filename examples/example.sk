@@ -1,0 +1,11 @@
+extern function printi(a)
+
+function hello(a) {
+	var b = 10
+	var c = 11
+	printi(a)
+}
+
+var a = 10
+var b = 200
+hello(b)
