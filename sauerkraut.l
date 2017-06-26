@@ -12,6 +12,7 @@ D	[0-9]
 var			return VARKW;
 function		return FUNKW;
 end			return END;
+while			return WHILEKW;
 {L}({L}|{D})*		yylval.s = yytext; return ID;
 [+-]?{D}+		yylval.i = atoi(yytext); return INTEGER;
 L?\"(\\.|[^\\"])*\"	yylval.s = yytext; return STRING;

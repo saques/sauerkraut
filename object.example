@@ -1,5 +1,4 @@
-var obj = {
-	hola:"esto";
-	es:55;
-	un: {objeto:[];};
-};
+while(1<2)
+	i++;
+	i=0;
+end
