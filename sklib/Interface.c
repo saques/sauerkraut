@@ -2,6 +2,7 @@
 #include <Object.h>
 #include <Integer.h>
 #include <String.h>
+#include <stdio.h>
 
 void * newIntegerObj(int i){
 	return (void *)newObject(newInteger(i),integerClass());
@@ -24,5 +25,12 @@ void * newArrayObj(void ** vals, int n){
 void *  printi(void * i) {
 	int a = ((Integer *)((Object *) i)->instance)->i;
 	printf("%d\n", a);
+	return 0;
+}
+
+void * print(void * v){
+	Object * o = ((Object *)_funcexec((Object *)v,"toString",NULL,0));
+	String * s = (String *)o->instance;
+	printf("%s\n",s->s);
 	return 0;
 }

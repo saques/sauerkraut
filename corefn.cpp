@@ -27,4 +27,5 @@ void appendIntInit(CodeGenContext * context, const char * name)
 void createCoreFunctions(CodeGenContext& context){
 	appendIntInit(&context, "newIntegerObj");
 	appendCoreFunction(&context, "printi", 1);
+	appendCoreFunction(&context,"print",1);
 }
