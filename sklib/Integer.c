@@ -17,7 +17,7 @@ static Class * iClass = NULL;
 const static int NMETHODS = 6;
 
 //[this]
-Object * toString(void ** args, int nArgs){
+Object * toStringInteger(void ** args, int nArgs){
 	Integer * this = (Integer *)(((Object *)args[nArgs])->instance);
 	char * s = malloc(BUFSIZE);
 	snprintf(s,BUFSIZE,"%d",this->i);
@@ -82,14 +82,14 @@ Class * integerClass(){
 		return iClass;
 	}
 	iClass = newClass(INTEGER,NMETHODS);
-	
+
 	iClass->methods[0] = newObject(newMethod((function)sum,"sum"),methodClass());
 	iClass->methods[1] = newObject(newMethod((function)subtract,"subtract"),methodClass());
 	iClass->methods[2] = newObject(newMethod((function)multiply,"multiply"),methodClass());
 	iClass->methods[3] = newObject(newMethod((function)divide,"divide"),methodClass());
 	iClass->methods[4] = newObject(newMethod((function)modulo,"modulo"),methodClass());
-	iClass->methods[5] = newObject(newMethod((function)toString,"toString"),methodClass());
-	
+	iClass->methods[5] = newObject(newMethod((function)toStringInteger,"toString"),methodClass());
+
 	return iClass;
 }
 

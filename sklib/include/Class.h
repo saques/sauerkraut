@@ -4,11 +4,11 @@
 #include <Object.h>
 typedef struct Object Object;
 
-const char INTEGER[] = "INTEGER";
-const char STRING[] = "STRING";
-const char ARRAY[] = "ARRAY";
-const char OBJECT[] = "OBJECT";
-const char METHOD[] = "METHOD";
+extern const char INTEGER[];
+extern const char STRING[];
+extern const char ARRAY[];
+extern const char OBJECT[];
+extern const char METHOD[];
 
 
 

@@ -4,6 +4,7 @@
 #include <deque>
 using namespace std;
 
+
 /* Compile the AST into a module */
 bool CodeGenContext::generateCode(BlockNode& root, raw_ostream * out)
 {
@@ -57,7 +58,15 @@ GenericValue CodeGenContext::runCode() {
 Value* IntegerNode::codeGen(CodeGenContext& context)
 {
 	std::cerr << "Creating integer: " << value << endl;
-	return ConstantInt::get(Type::getInt64Ty(getGlobalContext()), value, true);
+	Function *function = context.module->getFunction("newIntegerObj");
+	if (function == NULL) {
+		std::cerr << "no such function (coreCoreFunctionFail) " << "newIntegerObj"<< endl;
+	}
+	std::vector<Value*> args;
+	ExpressionList::const_iterator it;
+	args.push_back(ConstantInt::get(Type::getInt64Ty(getGlobalContext()), value, true));
+	CallInst *call = CallInst::Create(function, makeArrayRef(args), "", context.currentBlock());
+	return call;
 }
 
 Value* IdentifierNode::codeGen(CodeGenContext& context)
@@ -84,7 +93,8 @@ Value* VariableDeclarationNode::codeGen(CodeGenContext& context)
 {
 	std::cerr << "Creating variable declaration " << id.name << endl;
 	if (context.locals().find(id.name) == context.locals().end()) {
-		AllocaInst *alloc = new AllocaInst(Type::getInt64Ty(getGlobalContext())
+		Type * type = PointerType::get(IntegerType::get(getGlobalContext(), 8), 0);
+		AllocaInst *alloc = new AllocaInst(type
 				, id.name.c_str(), context.currentBlock());
 		context.locals()[id.name] = alloc;
 		if (assignmentExpr != NULL) {

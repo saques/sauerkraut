@@ -13,7 +13,7 @@ static Class * sClass = NULL;
 const static int NMETHODS = 5;
 
 //[this]
-Object * toString(void ** args, int nArgs){
+Object * toStringString(void ** args, int nArgs){
 	return args[nArgs];
 }
 
@@ -27,9 +27,9 @@ Class * stringClass(){
 		return sClass;
 	}
 	sClass = newClass(STRING,NMETHODS);
-	
-	sClass->methods[0] = newObject(newMethod((function)toString,"toString"),methodClass());
-	
+
+	sClass->methods[0] = newObject(newMethod((function)toStringString,"toString"),methodClass());
+
 	return sClass;
 }
 

@@ -20,3 +20,9 @@ void * newArrayObj(void ** vals, int n){
 	//TODO
 	return 0;
 }
+
+void *  printi(void * i) {
+	int a = ((Integer *)((Object *) i)->instance)->i;
+	printf("%d\n", a);
+	return 0;
+}
