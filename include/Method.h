@@ -1,7 +1,8 @@
-#IFNDEF METHOD_H
-#DEFINE METHOD_H
+#ifndef METHOD_H
+#define METHOD_H
 
 #include "Object.h"
+#include "Class.h"
 
 
 typedef Object * (*function)(void**,int);
@@ -19,4 +20,4 @@ Class * methodClass();
 
 Method * newMethod(function f, const char * name);
 
-#ENDIF
+#endif

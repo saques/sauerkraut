@@ -1,5 +1,6 @@
 #include <Method.h>
 #include <Class.h>
+#include <Object.h>
 #include <string.h>
 #include <stdio.h>
 
@@ -15,8 +16,8 @@
 const static int NMETHODS = 1;
  
 //[args(0)...args(nArgs-1),this]
-void * execute(void** args, int nArgs){
-	Method * f = (Method *)args[nArgs];
+Object * execute(void** args, int nArgs){
+	Method * f = (Method *)(((Object *)args[nArgs])->instance);
 	return f->f(args,nArgs);
 }
 
@@ -52,7 +53,7 @@ void * execute(void** args, int nArgs){
  * 
  * f(5,"five") and f.execute(5,"five") are synonyms
  */  
-void * _funcexec(Object * o, const char * name, void ** args, int nArgs){
+Object * _funcexec(Object * o, const char * name, void ** args, int nArgs){
 	Class * c = o->class;
 	for(int i=0; i<c->nMethods; i++){
 		if(strcmp(name,c->methods[i])==0){

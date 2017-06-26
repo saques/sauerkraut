@@ -1,5 +1,5 @@
-#IFNDEF OBJECT_H
-#DEFINE OBJECT_H
+#ifndef OBJECT_H
+#define OBJECT_H
 
 #include "Class.h"
 
@@ -32,4 +32,4 @@ typedef struct Object {
  * newObject(newInteger(5),integerClass);
  */
 Object * newObject(void * instance, Class * class);
-#ENDIF
+#endif

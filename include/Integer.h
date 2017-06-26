@@ -1,5 +1,5 @@
-#IFNDEF INTEGER_H
-#DEFINE INTEGER_H
+#ifndef INTEGER_H
+#define INTEGER_H
 
 #include "Class.h"
 
@@ -11,4 +11,4 @@ Class * integerClass();
 
 Integer * newInteger(int i);
 
-#ENDIF
+#endif

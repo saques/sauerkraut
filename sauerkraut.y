@@ -5,13 +5,18 @@
 #include <deque>
 
 void line(char * s);
+
+char BUFFER[1024];
 BlockNode * programStart;
 extern int yylex();
 extern int yylineno;
+
 void yyerror(const char * s){
 	std::fprintf(stderr, ">>>Error: %s at line %d \n", s, yylineno);
 	std::exit(1);
 }
+
+
 %}
 %define parse.error verbose
 %union
@@ -36,7 +41,7 @@ void yyerror(const char * s){
 %type <expr>	INSTR VALUE INT
 %type <expr_list> PASSEDARGS
 
-%type <i> INTEGER
+%type <i> INTEGER STRING
 %type <s> ID
 
 %right "="
@@ -129,9 +134,11 @@ INT			: INTEGER
 			{
 				$$ = new IntegerNode($1);
 			}
+
 BLOCK		: EXPR  BLOCK | /*empty*/ ;
 
 INSTR		: ASSIGN ';'| CALL ';' | WHILE ;
+
 
 CALL		:  IDENT '(' PASSEDARGS ')'
 		 | IDENT '(' ')'
@@ -153,6 +160,7 @@ PASSEDARGS	:  INSTR ',' PASSEDARGS
 			}
 			;
 
+
 WHILE		: WHILEKW '(' I2 ')' BLOCK END;
 
 I2		:  I '<' I
@@ -166,6 +174,7 @@ I2		:  I '<' I
 		 ;
 
 ASSIGN		: IDENT '=' I ;
+
 
 I		:  I '+' I
 		 | I '-' I
@@ -205,8 +214,12 @@ int yywrap() {
 	//INCLUDES
 	line("#include <Method.h>");
 	line("#include <Integer.h>");
+	line("#include <String.h>");
+	line("#include <Object.h>");
+
 	//setup global variables and class singletons
-	line("Class * integerClass = integerClass()");
-	line("Class * methodClass = methodClass()");
+	line("Class * integerClass = integerClass();");
+	line("Class * methodClass = methodClass();");
+	line("Class * stringClass = stringClass();");
 	yyparse();
 }*/

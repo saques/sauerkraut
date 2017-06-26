@@ -1,5 +1,5 @@
-#IFNDEF CLASS_H
-#DEFINE CLASS_H
+#ifndef CLASS_H
+#define CLASS_H
 
 #include "Method.h"
 
@@ -25,4 +25,4 @@ typedef struct Class {
 
 Class * newClass(const char * name, Method ** methods, int nmethods);
 
-#ENDIF
+#endif

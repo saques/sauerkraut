@@ -1,67 +1,81 @@
-#include "Integer.h"
-#include "Class.h"
-#include "Method.h"
+#include <Integer.h>
+#include <Class.h>
+#include <Method.h>
 #include <string.h>
+#include <String.h>
+#include <Object.h>
+#include <stdlib.h>
+#define BUFSIZE 16
 
+
+extern Class * integerClass;
+extern Class * stringClass;
 
 /*
  * METHODS FOR Integer
  */
-const static int NMETHODS = 5;
-//[other,this]
-Integer * sum(void ** args, int nArgs){
-	if(nArgs!=1){
-		exit(1);
-	}
-	Integer * this = args[1];
-	Integer * other = args[0];
-	return newInteger(this->i+other->i);
+const static int NMETHODS = 6;
+
+//[this]
+Object * toString(void ** args, int nArgs){
+	Integer * other = (Integer *)(((Object *)args[nArgs])->instance);
+	char * s = malloc(BUFSIZE);
+	snprintf(s,BUFSIZE,"%d",this->i);
+	return newObject(newString(s),stringClass);
 }
 
 //[other,this]
-Integer * subtract(void ** args, int nArgs){
+Object * sum(void ** args, int nArgs){
 	if(nArgs!=1){
 		exit(1);
 	}
-	Integer * this = args[1];
-	Integer * other = args[0];
-	return newInteger(this->i-other->i);
+	Integer * this = (Integer *)(((Object *)args[1])->instance);
+	Integer * other = (Integer *)(((Object *)args[0])->instance);
+	return newObject(newInteger(this->i+other->i),integerClass);
 }
 
 //[other,this]
-Integer * multiply(void ** args, int nArgs){
+Object * subtract(void ** args, int nArgs){
 	if(nArgs!=1){
 		exit(1);
 	}
-	Integer * this = args[1];
-	Integer * other = args[0];
-	return newInteger(this->i*other->i);
+	Integer * this = (Integer *)(((Object *)args[1])->instance);
+	Integer * other = (Integer *)(((Object *)args[0])->instance);
+	return newObject(newInteger(this->i-other->i),integerClass);
 }
 
 //[other,this]
-Integer * divide(void ** args, int nArgs){
+Object * multiply(void ** args, int nArgs){
 	if(nArgs!=1){
 		exit(1);
 	}
-	Integer * this = args[1];
-	Integer * other = args[0];
-	return newInteger(this->i/other->i);
+	Integer * this = (Integer *)(((Object *)args[1])->instance);
+	Integer * other = (Integer *)(((Object *)args[0])->instance);
+	return newObject(newInteger(this->i*other->i),integerClass);
 }
 
 //[other,this]
-Integer * modulo(void ** args, int nArgs){
+Object * divide(void ** args, int nArgs){
 	if(nArgs!=1){
 		exit(1);
 	}
-	Integer * this = args[1];
-	Integer * other = args[0];
-	return newInteger(this->i%other->i);
+	Integer * this = (Integer *)(((Object *)args[1])->instance);
+	Integer * other = (Integer *)(((Object *)args[0])->instance);
+	return newObject(newInteger(this->i/other->i),integerClass);
 }
 
+//[other,this]
+Object * modulo(void ** args, int nArgs){
+	if(nArgs!=1){
+		exit(1);
+	}
+	Integer * this = (Integer *)(((Object *)args[1])->instance);
+	Integer * other = (Integer *)(((Object *)args[0])->instance);
+	return newObject(newInteger(this->i%other->i),integerClass);
+}
 /*
  * END METHODS FOR Integer
  */
-
 
 /*
  * This function should be executed only
@@ -75,6 +89,7 @@ Class * integerClass(){
 	m[2] = newMethod((function)multiply,"multiply");
 	m[3] = newMethod((function)divide,"divide");
 	m[4] = newMethod((function)modulo,"modulo");
+	m[5] = newMethod((function)toString,"toString");
 	return newClass(METHOD,m,NMETHODS);
 }
 
