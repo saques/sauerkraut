@@ -4,6 +4,8 @@
 
 void line(char * s);
 
+char BUFFER[1024];
+
 %}
 %define parse.error verbose
 %union
@@ -11,6 +13,8 @@ void line(char * s);
 	int i;
 	char * s;
 }
+%type<s> id STRING VALUE
+%type<i> INTEGER
 %token ID INTEGER STRING VARKW FUNKW END LE GE EQ NE OR AND WHILEKW
 %right "="
 %left OR AND
@@ -24,29 +28,29 @@ S		: ST ;
 
 ST		: EXPR ST | FUNC ST | /*empty*/ ;
 
-EXPR		: VAR | INSTR ;
+EXPR		: VAR ';' | INSTR ;
 
-VAR		:  VARKW ID 
-                 | VARKW ID '=' VALUE ;
+VAR		:  VARKW id           {printf("void * %s = null;\n",$2) ;} 
+                 | VARKW id '=' VALUE {printf("void * %s = %s;\n",$2,$4);}
 
-FUNC		: FUNKW ID ARGS BLOCK END;
+FUNC		: FUNKW id ARGS BLOCK END;
 
 ARGS		: '(' ARGSET ')' | '(' ')';
 
-ARGSET		: ID | ID ',' ARGSET ;
+ARGSET		: id | id ',' ARGSET ;
 
 BLOCK		: EXPR  BLOCK | /*empty*/ ;
 
 INSTR		: ASSIGN ';'| CALL ';' | WHILE ;
 
-CALL		:  ID '(' PASSEDARGS ')'
-		 | ID '(' ')'
+CALL		:  id '(' PASSEDARGS ')'
+		 | id '(' ')'
                    ;
 
 PASSEDARGS	:  VALUE ',' PASSEDARGS
 		 | ID ',' PASSEDARGS
 		 | VALUE
-		 | ID;
+		 | id;
 
 WHILE		: WHILEKW '(' I2 ')' BLOCK END;
 
@@ -60,7 +64,8 @@ I2		:  I '<' I
 		 | I AND I
 		 ;
 
-ASSIGN		: ID '=' I ;
+ASSIGN		:  id '=' I 
+		 | id '=' VALUE ;
 
 I		:  I '+' I 
 		 | I '-' I
@@ -74,20 +79,24 @@ I		:  I '+' I
 		 | I NE I
 		 | I OR I
 		 | I AND I
-		 | ID  
-		 | INTEGER ;
+		 | id   ;
 
 OBJECT		: '{' KV_SET '}' ;
 
 KV_SET		: KV KV_SET | KV | /*empty*/ ;
 
-KV		: ID ':' VALUE ';' ; 
+KV		: id ':' VALUE ';' ; 
 
 ARRAY		: '['V_SET']' ;
 
 V_SET		: VALUE ',' V_SET  | VALUE | /*empty*/ ;
 
-VALUE		: INTEGER | STRING | ARRAY | OBJECT ; 
+VALUE		:  INTEGER { sprintf(BUFFER,"newObject(newInteger(%d),integerClass)",$1); $$ = BUFFER ;}; 
+		 | STRING  { sprintf(BUFFER,"newObject(newString(%s),stringClass)",$1);   $$ = BUFFER ;};
+		 | ARRAY 
+		 | OBJECT ; 
+
+id		: ID { $$ = strdup(yylval.s); } ;
 
 %%
 void line(char * s){
@@ -103,8 +112,12 @@ main() {
 	//INCLUDES
 	line("#include <Method.h>");
 	line("#include <Integer.h>");
+	line("#include <String.h>");
+	line("#include <Object.h>");
+
 	//setup global variables and class singletons
-	line("Class * integerClass = integerClass()");
-	line("Class * methodClass = methodClass()");
+	line("Class * integerClass = integerClass();");
+	line("Class * methodClass = methodClass();");
+	line("Class * stringClass = stringClass();");
 	yyparse();
 }

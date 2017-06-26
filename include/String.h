@@ -1,5 +1,5 @@
-#IFNDEF STRING_H
-#DEFINE STRING_H
+#ifndef STRING_H
+#define STRING_H
 
 #include "Class.h"
 
@@ -11,4 +11,4 @@ Class * stringClass();
 
 String * newString(const char * s);
 
-#ENDIF
+#endif
