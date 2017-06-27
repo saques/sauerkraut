@@ -100,6 +100,14 @@ public:
 	virtual llvm::Value* codeGen(CodeGenContext& context);
 };
 
+class ArrayCreationNode : public ExpressionNode {
+public:
+	ExpressionList elements;
+	ArrayCreationNode(ExpressionList& elements) :
+		elements(elements) { }
+	virtual llvm::Value* codeGen(CodeGenContext& context);
+};
+
 class FunctionDeclarationNode : public StatementNode {
 public:
 	IdentifierNode& id;

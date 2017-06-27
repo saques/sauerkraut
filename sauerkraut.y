@@ -29,6 +29,7 @@ void yyerror(const char * s){
 	VariableDeclarationNode *var_decl;
 	std::deque<VariableDeclarationNode*> *arg_list;
 	std::deque<ExpressionNode*> *expr_list;
+	std::deque<ExpressionNode*> *arr_list;
 	int i;
 	char * s;
 }
@@ -38,10 +39,13 @@ void yyerror(const char * s){
 %type <ident> 	IDENT
 %type <block> 	ST BLOCK
 %type <arg_list> ARGS ARGSET
-%type <expr>	INSTR VALUE INT CALL I STR ASSIGN
+%type <expr>	INSTR VALUE INT CALL I STR ASSIGN ARRAY
 %type <expr_list> PASSEDARGS
 %type <i> INTEGER EXTERN_FUNC_ARGS
 %type <s> ID STRING
+
+%type <arr_list> V_SET
+
 
 %right "="
 %left OR AND
@@ -114,6 +118,30 @@ FUNC	: FUNKW IDENT ARGS '{' ST '}'
 			$$ = new FunctionDeclarationNode(*$2, $3, *$5);
 		}
 		;
+		
+		
+ARRAY		: '['V_SET']' 
+			{
+				$$ = new ArrayCreationNode(*$2);
+			};		
+			
+V_SET		: VALUE ',' V_SET  
+			{
+				$$ = $3;
+				$$->push_front($1);
+			}
+
+			| VALUE 
+			{
+				$$ = new ExpressionList();
+				$$->push_front($1);
+			}
+			| /*empty*/
+			{
+				$$ = new ExpressionList();
+			};
+
+
 
 ARGS	: '(' ARGSET ')'
 		{
@@ -258,10 +286,6 @@ OBJECT		: '{' KV_SET '}' ;
 KV_SET		: KV KV_SET | KV | /*empty*/ ;
 
 KV		: IDENT ':' VALUE ';' ;
-
-ARRAY		: '['V_SET']' ;
-
-V_SET		: VALUE ',' V_SET  | VALUE | /*empty*/ ;
 
 VALUE		: INT | STR | ARRAY | OBJECT ;
 
