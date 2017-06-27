@@ -1,7 +1,7 @@
 var s = "hola"
 
 var n = "negreada   "+s
-n=read()
+n=readi(s)
 
-print(n+"aaaa")
+print(n)
 

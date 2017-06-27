@@ -5,7 +5,8 @@
 #include "include/String.h"
 #include "include/Method.h"
 #include "include/Array.h"
-#define INT_0 (void *)newObject(newInteger(0),integerClass())
+#define INT0 (void *)newObject(newInteger(0),integerClass())
+#define BUFSIZE 32
 
 void * newIntegerObj(int i){
 	return (void *)newObject(newInteger(i),integerClass());
@@ -17,7 +18,7 @@ void * newStringObj(const char * s){
 
 void * newKVObjectObj(char ** keys, void ** vals, int n){
 	//TODO
-	return 0;
+	return INT0;
 }
 
 void * newArrayObj(void ** vals, int n){
@@ -35,11 +36,11 @@ void *  printi(void * i) {
 void * readi(void *i){
 	String *s=((String *)((Object *) i)->instance);
 	scanf("%s",s->s);
-	return INT_0;
+	return INT0;
 }
 
 void * read(){
-	char * rec = malloc(42); //MAGIC NUMBER
+	char * rec = malloc(BUFSIZE);
 	scanf("%s",rec);
 	return (void *)newObject(newString(rec),stringClass());
 }
@@ -53,5 +54,5 @@ void * print(void * v){
 	Object * o = ((Object *)_funcexec((Object *)v,"toString",NULL,0));
 	String * s = (String *)o->instance;
 	printf("%s\n",s->s);
-	return 0;
+	return INT0;
 }
