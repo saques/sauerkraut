@@ -137,7 +137,7 @@ ARRAY		: '['V_SET']'
 			| '[' ']'
 			{
 				ExpressionList * el = new ExpressionList();
-				$$ = new ArrayCreationNode(el);
+				$$ = new ArrayCreationNode(*el);
 			};		
 			
 V_SET		: VALUE ',' V_SET  
@@ -313,7 +313,8 @@ I		:  I '+' I
          }
 		 | IDENT
 		 | INT
-		 | STR;
+		 | STR
+		 | ARRAY;
 
 OBJECT		: '{' KV_SET '}' ;
 

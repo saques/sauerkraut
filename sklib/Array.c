@@ -71,18 +71,30 @@ static Class * arrClass = NULL;
 		 errorout("Array::toString expects 0 arguments");
 	 }
 	 Array * a = (Array *)((Object *)this)->instance;
-	 char * ans = malloc(BUFSIZE);
-	 strcpy(ans,"[");
-	 int len=a->n;
-	 for(int i=0;i<len;i++){
+	 
+	 const char ** strs = malloc(a->n);
+	 
+	 int len = 0;
+	 for(int i=0; i<a->n; i++){
 		Object * cache= (Object *)(a->objs[i]);
 		cache = ((Object *)_funcexec(cache,"toString",NULL,0));
-		String * s=(String *)cache->instance;
-		strcat(ans,s->s);
+		strs[i] = ((String *)cache->instance)->s;
+		len += strlen(strs[i]);
+	 }  
+	 
+	 int commas = a->n == 0  || a->n == 1 ? 0 : a->n - 1 ; 
+	 
+	 char * ans = malloc(len+2+1+commas);
+	 strcpy(ans,"[");
+	 int i = 0 ;
+	 for(;i<a->n-1;i++){
+		strcat(ans,strs[i]);
 		strcat(ans,",");
 	 }
+	 if(a->n>0){
+		 strcat(ans,strs[a->n-1]);
+	 }
 	 strcat(ans,"]");
-	 //sprintf(ans,"Array: Size = %d",a->n);
 	 return newObject(newString(ans),stringClass());
  }
  
@@ -108,7 +120,10 @@ Class * arrayClass(){
 
 Array * newArray(void ** objs, int n){
 	Array * ans = (Array *)malloc(sizeof(Array));
-	ans->objs = (Object **)objs;
+	ans->objs = (Object **)malloc(n*sizeof(Object *));
+	for(int i=0; i<n; i++){
+		ans->objs[i] = (Object *)objs[i];
+	}
 	ans->n = n;
 	return ans;
 }

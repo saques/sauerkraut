@@ -82,6 +82,46 @@ Value* StringNode::codeGen(CodeGenContext& context)
 	return call;
 }
 
+Value* ArrayCreationNode::codeGen(CodeGenContext& context)
+{
+	std::cerr << "Creating array" << endl;
+	Function *function = context.module->getFunction("newArrayObj");
+	if (function == NULL) {
+		std::cerr << "no such function (coreCoreFunctionFail) " << "newArrayObj"<< endl;
+	}
+	
+	std::vector<Value*> args;
+	ExpressionList::const_iterator it;
+	int i=0;
+	
+	Type * voidp = PointerType::get(IntegerType::get(getGlobalContext(), 8), 0);
+	ArrayType* arrayType = ArrayType::get(voidp, elements.size());
+
+	Value* arr_alloc = new AllocaInst(
+		   arrayType, "arrargs", context.currentBlock()
+	);
+	auto zero = ConstantInt::get(getGlobalContext(), llvm::APInt(64, 0, true));
+	for (it = elements.begin(); it != elements.end(); it++, i++) {
+		auto index = ConstantInt::get(getGlobalContext(), llvm::APInt(32, i, true));
+		auto ptr = GetElementPtrInst::Create(arrayType, arr_alloc, { zero, index }, "", context.currentBlock());
+		auto store = new llvm::StoreInst(
+			(**it).codeGen(context),
+			ptr,
+			false,
+			context.currentBlock()
+		);
+	}
+	auto index = ConstantInt::get(getGlobalContext(), llvm::APInt(32, 0, true));
+	auto ptr = GetElementPtrInst::Create(arrayType, arr_alloc, { zero, index }, "", context.currentBlock());
+	
+	args.push_back(ptr);
+	
+	args.push_back(ConstantInt::get(Type::getInt64Ty(getGlobalContext()), elements.size(), true));
+	
+	CallInst *call = CallInst::Create(function, makeArrayRef(args), "", context.currentBlock());
+	return call;
+}
+
 Value* IdentifierNode::codeGen(CodeGenContext& context)
 {
 	std::cerr << "Creating identifier reference: " << name << endl;
