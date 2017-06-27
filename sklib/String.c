@@ -55,7 +55,7 @@ Object * sumString(void * obj, void ** args, int nArgs){
 
 Object * Strequal(void * obj, void ** args, int nArgs){
 	if(nArgs!=1){
-		errorout("String::sum expects 1 arguments");
+		errorout("String::equal expects 1 arguments");
 		exit(1);
 	}
 	String * this = (String *)((Object *)obj)->instance;
@@ -68,7 +68,7 @@ Object * Strequal(void * obj, void ** args, int nArgs){
 
 Object * Strlower(void * obj, void ** args, int nArgs){
 	if(nArgs!=1){
-		errorout("String::sum expects 1 arguments");
+		errorout("String::lower expects 1 arguments");
 		exit(1);
 	}
 	String * this = (String *)((Object *)obj)->instance;
@@ -81,7 +81,7 @@ Object * Strlower(void * obj, void ** args, int nArgs){
 
 Object * Strgreater(void * obj, void ** args, int nArgs){
 	if(nArgs!=1){
-		errorout("String::sum expects 1 arguments");
+		errorout("String::greater expects 1 arguments");
 		exit(1);
 	}
 	String * this = (String *)((Object *)obj)->instance;
