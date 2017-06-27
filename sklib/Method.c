@@ -68,7 +68,7 @@ Object * _funcexec(Object * o, const char * name, void ** args, int nArgs){
 	/*
 	 * No method has matched
 	 */
-	fprintf(stderr,"No method with name %s has been found\n",name);
+	fprintf(stderr,"%s : method %s not found\n",c->name,name);
 	exit(1);
 }
 

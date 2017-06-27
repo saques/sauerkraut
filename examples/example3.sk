@@ -1,5 +1,5 @@
-var a = 2 + 2
+var a = 2 + 2 + 2
 
-printi(a)
+print(a)
 a = 12-3
-printi(a)
+print(a)

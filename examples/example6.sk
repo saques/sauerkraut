@@ -1,0 +1,6 @@
+var s = "hola"
+
+var n = 5+s
+
+print(n)
+

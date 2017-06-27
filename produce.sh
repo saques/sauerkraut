@@ -4,10 +4,15 @@ make
 cd ..
 make
 ./sauerkraut $1 -o  archivo.ll
-clang archivo.ll sklib/sklib.a -o a.out
-if [$? -ne 0]
+if [ $? -ne 0 ]
 then
-	echo FAILED!!!
+	echo LLVM FAILED!!
+	exit
+fi
+clang archivo.ll sklib/sklib.a -o a.out
+if [ $? -ne 0 ]
+then
+	echo CLANG FAILED!!!
 else
 	echo RUNNING...
 	./a.out

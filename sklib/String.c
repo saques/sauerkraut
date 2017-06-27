@@ -2,8 +2,11 @@
 #include "include/Class.h"
 #include "include/Method.h"
 #include "include/Object.h"
+#include "include/Integer.h"
+#include "include/ErrorPrint.h"
 #include <string.h>
 #include <stdlib.h>
+#include <string.h>
 
 
 static Class * sClass = NULL;
@@ -11,11 +14,42 @@ static Class * sClass = NULL;
 /*
  * METHODS FOR String
  */
-const static int NMETHODS = 5;
+const static int NMETHODS = 3;
 
-//[this]
 Object * toStringString(void * obj, void ** args, int nArgs){
+	if(nArgs!=0){
+		errorout("String::toString expects 0 arguments");
+		exit(1);
+	}
 	return (Object *)obj;
+}
+
+Object * toIntString(void * obj, void ** args, int nArgs){
+	if(nArgs!=0){
+		errorout("String::toInt expects 0 arguments");
+		exit(1);
+	}
+	String * this = (String *)((Object *)obj)->instance;
+	int i = strlen(this->s);
+	return newObject(newInteger(i),integerClass());
+}
+
+Object * sumString(void * obj, void ** args, int nArgs){
+	if(nArgs!=1){
+		errorout("String::sum expects 1 arguments");
+		exit(1);
+	}
+	String * this = (String *)((Object *)obj)->instance;
+
+	Object * o = _funcexec((Object *)args[0],"toString",NULL,0);
+	String * other = (String *)(o->instance);
+
+	char * ans = malloc(strlen(this->s)+strlen(other->s)-1);
+
+	strcpy(ans,this->s);
+	strcat(ans,other->s);
+
+	return newObject(newString(ans),stringClass());
 }
 
 /*
@@ -30,12 +64,15 @@ Class * stringClass(){
 	sClass = newClass(STRING,NMETHODS);
 
 	sClass->methods[0] = newObject(newMethod((function)toStringString,"toString"),methodClass());
+	sClass->methods[1] = newObject(newMethod((function)toIntString,"toInt"),methodClass());
+	sClass->methods[2] = newObject(newMethod((function)sumString,"sum"),methodClass());
 
 	return sClass;
 }
 
 String * newString(const char * s){
 	String * ans = (String *)malloc(sizeof(String));
-	ans->s=s;
+	char * c_string = strdup(s);
+	ans->s=c_string;
 	return ans;
 }
