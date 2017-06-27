@@ -123,6 +123,11 @@ FUNC	: FUNKW IDENT ARGS '{' ST '}'
 ARRAY		: '['V_SET']' 
 			{
 				$$ = new ArrayCreationNode(*$2);
+			}
+			| '[' ']'
+			{
+				ExpressionList * el = new ExpressionList();
+				$$ = new ArrayCreationNode(el);
 			};		
 			
 V_SET		: VALUE ',' V_SET  
@@ -130,15 +135,10 @@ V_SET		: VALUE ',' V_SET
 				$$ = $3;
 				$$->push_front($1);
 			}
-
 			| VALUE 
 			{
 				$$ = new ExpressionList();
 				$$->push_front($1);
-			}
-			| /*empty*/
-			{
-				$$ = new ExpressionList();
 			};
 
 
