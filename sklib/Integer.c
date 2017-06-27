@@ -105,54 +105,75 @@ Object * modulo(void * obj,void ** args, int nArgs){
 //[other,this]
 Object * equal(void * obj,void ** args, int nArgs){
     if(nArgs!=1){
+        errorout("Integer::equal expects 1 argument");
         exit(1);
     }
     Integer * this = (Integer *)(((Object *)obj)->instance);
-    Integer * other = (Integer *)(((Object *)args[0])->instance);
+
+    Object * o = _funcexec((Object *)args[0],"toInt",NULL,0);
+    Integer * other = (Integer *)(o->instance);
+
     return newObject(newInteger(this->i==other->i),integerClass());
 }
 //[other,this]
 Object * lower(void * obj,void ** args, int nArgs){
     if(nArgs!=1){
+        errorout("Integer::lower expects 1 argument");
         exit(1);
     }
     Integer * this = (Integer *)(((Object *)obj)->instance);
-    Integer * other = (Integer *)(((Object *)args[0])->instance);
+
+    Object * o = _funcexec((Object *)args[0],"toInt",NULL,0);
+    Integer * other = (Integer *)(o->instance);
+
     return newObject(newInteger(this->i<other->i),integerClass());
 }
 //[other,this]
 Object * greater(void * obj,void ** args, int nArgs){
     if(nArgs!=1){
+        errorout("Integer::greater expects 1 argument");
         exit(1);
     }
     Integer * this = (Integer *)(((Object *)obj)->instance);
-    Integer * other = (Integer *)(((Object *)args[0])->instance);
+
+    Object * o = _funcexec((Object *)args[0],"toInt",NULL,0);
+    Integer * other = (Integer *)(o->instance);
+
     return newObject(newInteger(this->i>other->i),integerClass());
 }
 
 //[other,this]
 Object * or(void * obj,void ** args, int nArgs){
     if(nArgs!=1){
+        errorout("Integer::or expects 1 argument");
         exit(1);
     }
     Integer * this = (Integer *)(((Object *)obj)->instance);
-    Integer * other = (Integer *)(((Object *)args[0])->instance);
+
+    Object * o = _funcexec((Object *)args[0],"toInt",NULL,0);
+    Integer * other = (Integer *)(o->instance);
+
     return newObject(newInteger(this->i||other->i),integerClass());
 }
 
 //[other,this]
 Object * and(void * obj,void ** args, int nArgs){
     if(nArgs!=1){
+        errorout("Integer::and expects 1 argument");
         exit(1);
     }
     Integer * this = (Integer *)(((Object *)obj)->instance);
-    Integer * other = (Integer *)(((Object *)args[0])->instance);
+
+    Object * o = _funcexec((Object *)args[0],"toInt",NULL,0);
+    Integer * other = (Integer *)(o->instance);
+
     return newObject(newInteger(this->i&&other->i),integerClass());
 }
 
 //[other,this]
 Object * not(void * obj,void ** args, int nArgs){
-    if(nArgs!=1){
+    if(nArgs!=0){
+        errorout("Integer::not expects 0 argument");
         exit(1);
     }
     Integer * this = (Integer *)(((Object *)obj)->instance);

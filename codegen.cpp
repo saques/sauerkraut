@@ -232,7 +232,7 @@ Value * UnaryOperationNode::codeGen(CodeGenContext& context)
 	args.push_back(ptr);
 	// args.push_back(ConstantDataArray::get(getGlobalContext(), makeArrayRef(funargs));
 	/* push arguments count (1) */
-	args.push_back(ConstantInt::get(Type::getInt64Ty(getGlobalContext()), 1, true));
+	args.push_back(ConstantInt::get(Type::getInt64Ty(getGlobalContext()), 0, true));
 	CallInst *call = CallInst::Create(function, makeArrayRef(args), "", context.currentBlock());
 	return call;
 }
