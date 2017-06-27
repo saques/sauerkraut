@@ -40,15 +40,15 @@ Object * sumString(void * obj, void ** args, int nArgs){
 		exit(1);
 	}
 	String * this = (String *)((Object *)obj)->instance;
-	
+
 	Object * o = _funcexec((Object *)args[0],"toString",NULL,0);
 	String * other = (String *)(o->instance);
-	
+
 	char * ans = malloc(strlen(this->s)+strlen(other->s)-1);
-	
+
 	strcpy(ans,this->s);
 	strcat(ans,other->s);
-	
+
 	return newObject(newString(ans),stringClass());
 }
 
@@ -72,6 +72,7 @@ Class * stringClass(){
 
 String * newString(const char * s){
 	String * ans = (String *)malloc(sizeof(String));
-	ans->s=s;
+	char * c_string = strdup(s);
+	ans->s=c_string;
 	return ans;
 }
