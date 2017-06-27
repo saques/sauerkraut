@@ -1,12 +1,13 @@
-#include <Integer.h>
-#include <Class.h>
-#include <Method.h>
 #include <string.h>
-#include <String.h>
-#include <Object.h>
-#include <ErrorPrint.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include "include/Integer.h"
+#include "include/Class.h"
+#include "include/Object.h"
+#include "include/String.h"
+#include "include/Method.h"
+#include "include/ErrorPrint.h"
+
 #define BUFSIZE 16
 
 

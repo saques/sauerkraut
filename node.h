@@ -114,8 +114,9 @@ class BinaryOperationNode : public ExpressionNode {
 public:
 	ExpressionNode& lhs;
 	ExpressionNode& rhs;
-	BinaryOperationNode(ExpressionNode& lhs, ExpressionNode& rhs) :
-		lhs(lhs), rhs(rhs) {}
+	std::string methodName;
+	BinaryOperationNode(ExpressionNode& lhs, ExpressionNode& rhs,std::string methodName) :
+		lhs(lhs), rhs(rhs), methodName(methodName) {}
 	virtual llvm::Value * codeGen(CodeGenContext& context);
 };
 

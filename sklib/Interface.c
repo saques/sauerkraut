@@ -1,9 +1,9 @@
-#include <Method.h>
-#include <Object.h>
-#include <Integer.h>
-#include <Array.h>
-#include <String.h>
 #include <stdio.h>
+#include "include/Object.h"
+#include "include/Integer.h"
+#include "include/String.h"
+#include "include/Method.h"
+#include "include/Array.h"
 
 void * newIntegerObj(int i){
 	return (void *)newObject(newInteger(i),integerClass());

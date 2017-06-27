@@ -227,12 +227,20 @@ ASSIGN		: IDENT '=' INSTR
 
 I		:  I '+' I
 		{
-
-			$$ = new BinaryOperationNode(*$1, *$3);
+			$$ = new BinaryOperationNode(*$1, *$3,"sum");
 		}
-		 | I '-' I
+		| I '-' I
+		{
+            $$ = new BinaryOperationNode(*$1, *$3,"subtract");
+        }
 		 | I '*' I
+		 {
+            $$ = new BinaryOperationNode(*$1, *$3,"multiply");
+         }
 		 | I '/' I
+		 {
+            $$ = new BinaryOperationNode(*$1, *$3,"divide");
+         }
 		 | I '<' I
 		 | I '>' I
 		 | I LE I

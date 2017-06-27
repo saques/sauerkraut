@@ -1,4 +1,4 @@
-#include <Object.h>
+#include "include/Object.h"
 #include <stdlib.h>
 
 Object * newObject(void * instance, Class * class){

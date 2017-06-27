@@ -1,5 +1,5 @@
 #include <stdlib.h>
-#include <Class.h>
+#include "include/Class.h"
 
 const char INTEGER[] = "INTEGER";
 const char STRING[] = "STRING";

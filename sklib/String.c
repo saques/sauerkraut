@@ -1,8 +1,9 @@
-#include <String.h>
-#include <Integer.h>
-#include <Class.h>
-#include <Method.h>
-#include <ErrorPrint.h>
+#include "include/String.h"
+#include "include/Class.h"
+#include "include/Method.h"
+#include "include/Object.h"
+#include "include/Integer.h"
+#include "include/ErrorPrint.h"
 #include <string.h>
 #include <stdlib.h>
 #include <string.h>

@@ -10,3 +10,4 @@ sauerkraut.cpp
 sauerkraut.hpp
 *.a
 *.out
+CMakeLists.txt
