@@ -9,4 +9,5 @@ tokens.cpp
 sauerkraut.cpp
 sauerkraut.hpp
 *.a
-/idea
+*.out
+CMakeLists.txt
