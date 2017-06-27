@@ -102,3 +102,12 @@ public:
 		id(id), arguments(arguments), block(block) {}
 	virtual llvm::Value* codeGen(CodeGenContext& context);
 };
+
+class BinaryOperationNode : public ExpressionNode {
+public:
+	ExpressionNode& lhs;
+	ExpressionNode& rhs;
+	BinaryOperationNode(ExpressionNode& lhs, ExpressionNode& rhs) :
+		lhs(lhs), rhs(rhs) {}
+	virtual llvm::Value * codeGen(CodeGenContext& context);
+};

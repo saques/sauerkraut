@@ -159,6 +159,76 @@ Value* FunctionCallNode::codeGen(CodeGenContext& context)
 	return call;
 }
 
+Value * createCharArray(CodeGenContext& context, std::string stri)
+{
+	const char * str = stri.c_str();
+	int len = strlen(str);
+	Type * chart = Type::getInt8Ty(getGlobalContext());
+	ArrayType* arrayType = ArrayType::get(chart,len + 1);
+
+	Value* arr_alloc = new AllocaInst(
+	    arrayType, "chararray", context.currentBlock()
+	);
+
+	auto zero = ConstantInt::get(getGlobalContext(), llvm::APInt(64, 0, true));
+	for (int i = 0; i < len; i++ ) {
+		auto index = ConstantInt::get(getGlobalContext(), llvm::APInt(32, i, true));
+		Type * voidp = PointerType::get(IntegerType::get(getGlobalContext(), 8), 0);
+		auto ptr = GetElementPtrInst::Create(arrayType, arr_alloc, { zero, index }, "", context.currentBlock());
+		auto store = new llvm::StoreInst(
+			ConstantInt::get(Type::getInt8Ty(getGlobalContext()), str[i], true),
+			ptr,
+			false,
+			context.currentBlock()
+		);
+	}
+	auto index = ConstantInt::get(getGlobalContext(), llvm::APInt(32, len, true));
+	Type * voidp = PointerType::get(IntegerType::get(getGlobalContext(), 8), 0);
+	auto ptr = GetElementPtrInst::Create(arrayType, arr_alloc, { zero, index }, "", context.currentBlock());
+	auto store = new llvm::StoreInst(
+		ConstantInt::get(Type::getInt8Ty(getGlobalContext()), 0, true),
+		ptr,
+		false,
+		context.currentBlock()
+	);
+	index = ConstantInt::get(getGlobalContext(), llvm::APInt(32, 0, true));
+	ptr = GetElementPtrInst::Create(arrayType, arr_alloc, { zero, index }, "", context.currentBlock());
+	return ptr;
+}
+
+Value * BinaryOperationNode::codeGen(CodeGenContext& context)
+{
+	Function * function = context.module->getFunction("funcexec");
+	if (function == NULL) {
+		std::cerr << "no such function (coreCoreFunctionFail) " << "funcexec"<< endl;
+	}
+	std::vector<Value*> args;
+	args.push_back(lhs.codeGen(context));
+	auto zero = ConstantInt::get(getGlobalContext(), llvm::APInt(64, 0, true));
+	auto index = ConstantInt::get(getGlobalContext(), llvm::APInt(32, 0, true));
+	/* push function name (sum) */
+	args.push_back(createCharArray(context, "sum"));
+	// std::vector<Value *> funargs;
+	// funargs.push_back(rhs.codeGen(context));
+	/* push function arguments {rhs exprssion} */
+	Type * voidp = PointerType::get(IntegerType::get(getGlobalContext(), 8), 0);
+	ArrayType* arrayType = ArrayType::get(voidp, 2);
+
+	Value* arr_alloc = new AllocaInst(
+	    arrayType, "sumarray", context.currentBlock()
+	);
+
+
+	auto ptr = GetElementPtrInst::Create(arrayType, arr_alloc, { zero, index }, "", context.currentBlock());
+	auto store = new llvm::StoreInst(rhs.codeGen(context), ptr, false, context.currentBlock());
+	args.push_back(ptr);
+	// args.push_back(ConstantDataArray::get(getGlobalContext(), makeArrayRef(funargs));
+	/* push arguments count (1) */
+	args.push_back(ConstantInt::get(Type::getInt64Ty(getGlobalContext()), 1, true));
+	CallInst *call = CallInst::Create(function, makeArrayRef(args), "", context.currentBlock());
+	return call;
+}
+
 Value * FunctionDeclarationNode::codeGen(CodeGenContext& context)
 {
 	vector<Type*> argTypes;

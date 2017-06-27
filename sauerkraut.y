@@ -38,7 +38,7 @@ void yyerror(const char * s){
 %type <ident> 	IDENT
 %type <block> 	ST BLOCK
 %type <arg_list> ARGS ARGSET
-%type <expr>	INSTR VALUE INT CALL
+%type <expr>	INSTR VALUE INT CALL I
 %type <expr_list> PASSEDARGS
 %type <i> INTEGER STRING EXTERN_FUNC_ARGS
 %type <s> ID
@@ -93,7 +93,7 @@ VAR		:  VARKW IDENT
 		{
 			$$ = new VariableDeclarationNode(*$2, 0);
 		}
-		| VARKW IDENT '=' VALUE
+		| VARKW IDENT '=' I
 		{
 			$$ = new VariableDeclarationNode(*$2, $4);
 		}
@@ -208,6 +208,9 @@ ASSIGN		: IDENT '=' I ;
 
 
 I		:  I '+' I
+		{
+			$$ = new BinaryOperationNode(*$1, *$3);
+		}
 		 | I '-' I
 		 | I '*' I
 		 | I '/' I

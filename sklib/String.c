@@ -13,7 +13,7 @@ static Class * sClass = NULL;
 const static int NMETHODS = 5;
 
 //[this]
-Object * toStringString(void ** args, int nArgs){
+Object * toStringString(void * obj, void ** args, int nArgs){
 	return args[nArgs];
 }
 
