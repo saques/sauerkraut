@@ -2,6 +2,9 @@
 #include "node.h"
 #include "sauerkraut.hpp"
 #include <stdlib.h>
+
+char * token = NULL;
+
 %}
 
 L	[a-zA-Z_]
@@ -18,7 +21,7 @@ while			return WHILEKW;
 extern			return EXTERNKW;
 {L}({L}|{D})*		yylval.s = yytext; return ID;
 [+-]?{D}+		yylval.i = atoi(yytext); return INTEGER;
-L?\"(\\.|[^\\"])*\"	yylval.s = yytext; return STRING;
+L?\"(\\.|[^\\"])*\"	{token = strtok(yytext,"\""); strtok(0,"\""); yylval.s = strdup(token); token = NULL; return STRING;}
 "<="			return LE;
 ">="			return GE;
 "=="			return EQ;

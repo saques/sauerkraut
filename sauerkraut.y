@@ -38,10 +38,10 @@ void yyerror(const char * s){
 %type <ident> 	IDENT
 %type <block> 	ST BLOCK
 %type <arg_list> ARGS ARGSET
-%type <expr>	INSTR VALUE INT CALL I
+%type <expr>	INSTR VALUE INT CALL I STR
 %type <expr_list> PASSEDARGS
-%type <i> INTEGER STRING EXTERN_FUNC_ARGS
-%type <s> ID
+%type <i> INTEGER EXTERN_FUNC_ARGS
+%type <s> ID STRING
 
 %right "="
 %left OR AND
@@ -159,6 +159,11 @@ INT			: INTEGER
 				$$ = new IntegerNode($1);
 			}
 
+STR			: STRING
+			{
+				$$ = new StringNode($1);
+			}
+
 BLOCK		: EXPR  BLOCK | /*empty*/ ;
 
 INSTR		: I | ASSIGN | CALL  | WHILE ;
@@ -235,7 +240,7 @@ ARRAY		: '['V_SET']' ;
 
 V_SET		: VALUE ',' V_SET  | VALUE | /*empty*/ ;
 
-VALUE		: INT | STRING | ARRAY | OBJECT ;
+VALUE		: INT | STR | ARRAY | OBJECT ;
 
 %%
 void line(char * s){
@@ -244,16 +249,3 @@ void line(char * s){
 int yywrap() {
 	return 1;
 }
-/*main() {
-	//INCLUDES
-	line("#include <Method.h>");
-	line("#include <Integer.h>");
-	line("#include <String.h>");
-	line("#include <Object.h>");
-
-	//setup global variables and class singletons
-	line("Class * integerClass = integerClass();");
-	line("Class * methodClass = methodClass();");
-	line("Class * stringClass = stringClass();");
-	yyparse();
-}*/
