@@ -14,7 +14,7 @@ static Class * sClass = NULL;
 /*
  * METHODS FOR String
  */
-const static int NMETHODS = 2;
+const static int NMETHODS = 3;
 
 Object * toStringString(void * obj, void ** args, int nArgs){
 	if(nArgs!=0){
@@ -34,6 +34,24 @@ Object * toIntString(void * obj, void ** args, int nArgs){
 	return newObject(newInteger(i),integerClass());
 }
 
+Object * sumString(void * obj, void ** args, int nArgs){
+	if(nArgs!=1){
+		errorout("String::sum expects 1 arguments");
+		exit(1);
+	}
+	String * this = (String *)((Object *)obj)->instance;
+	
+	Object * o = _funcexec((Object *)args[0],"toString",NULL,0);
+	String * other = (String *)(o->instance);
+	
+	char * ans = malloc(strlen(this->s)+strlen(other->s)-1);
+	
+	strcpy(ans,this->s);
+	strcat(ans,other->s);
+	
+	return newObject(newString(ans),stringClass());
+}
+
 /*
  * END METHODS FOR String
  */
@@ -46,7 +64,8 @@ Class * stringClass(){
 	sClass = newClass(STRING,NMETHODS);
 
 	sClass->methods[0] = newObject(newMethod((function)toStringString,"toString"),methodClass());
-	sClass->methods[0] = newObject(newMethod((function)toIntString,"toInt"),methodClass());
+	sClass->methods[1] = newObject(newMethod((function)toIntString,"toInt"),methodClass());
+	sClass->methods[2] = newObject(newMethod((function)sumString,"sum"),methodClass());
 
 	return sClass;
 }
