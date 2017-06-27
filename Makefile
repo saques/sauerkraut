@@ -13,9 +13,6 @@ LIBS = `$(LLVMCONFIG) --libs`
 
 clean:
 	$(RM) -rf sauerkraut.cpp sauerkraut.hpp sauerkraut tokens.cpp $(OBJS)
-	cd sklib
-	make
-	cd ..
 
 sauerkraut.cpp: sauerkraut.y
 	bison -d --debug --verbose  -o $@ $^

@@ -120,6 +120,15 @@ public:
 	virtual llvm::Value * codeGen(CodeGenContext& context);
 };
 
+class UnaryOperationNode : public ExpressionNode {
+public:
+    ExpressionNode& lhs;
+    std::string methodName;
+    UnaryOperationNode(ExpressionNode& lhs,std::string methodName) :
+            lhs(lhs), methodName(methodName) {}
+    virtual llvm::Value * codeGen(CodeGenContext& context);
+};
+
 class ReturnNode : public StatementNode {
 public:
 	ExpressionNode& expression;
