@@ -267,10 +267,6 @@ I		:  I '+' I
 		{
             $$ = new BinaryOperationNode(*$1, *$3,"subtract");
         }
-        | '(' I ')'
-        {
-         $$ = $2;
-        }
 		 | I '*' I
 		 {
             $$ = new BinaryOperationNode(*$1, *$3,"multiply");
