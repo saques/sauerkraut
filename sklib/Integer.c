@@ -103,7 +103,7 @@ Object * modulo(void * obj,void ** args, int nArgs){
 }
 
 //[other,this]
-Object * equal(void * obj,void ** args, int nArgs){
+Object * Intequal(void * obj,void ** args, int nArgs){
     if(nArgs!=1){
         errorout("Integer::equal expects 1 argument");
         exit(1);
@@ -116,7 +116,7 @@ Object * equal(void * obj,void ** args, int nArgs){
     return newObject(newInteger(this->i==other->i),integerClass());
 }
 //[other,this]
-Object * lower(void * obj,void ** args, int nArgs){
+Object * Intlower(void * obj,void ** args, int nArgs){
     if(nArgs!=1){
         errorout("Integer::lower expects 1 argument");
         exit(1);
@@ -129,7 +129,7 @@ Object * lower(void * obj,void ** args, int nArgs){
     return newObject(newInteger(this->i<other->i),integerClass());
 }
 //[other,this]
-Object * greater(void * obj,void ** args, int nArgs){
+Object * Intgreater(void * obj,void ** args, int nArgs){
     if(nArgs!=1){
         errorout("Integer::greater expects 1 argument");
         exit(1);
@@ -194,10 +194,10 @@ Class * integerClass(){
 	iClass->methods[2] = newObject(newMethod((function)multiply,"multiply"),methodClass());
 	iClass->methods[3] = newObject(newMethod((function)divide,"divide"),methodClass());
 	iClass->methods[4] = newObject(newMethod((function)modulo,"modulo"),methodClass());
-	iClass->methods[5] = newObject(newMethod((function)equal,"equal"),methodClass());
+	iClass->methods[5] = newObject(newMethod((function)Intequal,"equal"),methodClass());
 	iClass->methods[6] = newObject(newMethod((function)not,"not"),methodClass());
-	iClass->methods[7] = newObject(newMethod((function)lower,"lower"),methodClass());
-	iClass->methods[8] = newObject(newMethod((function)greater,"greater"),methodClass());
+	iClass->methods[7] = newObject(newMethod((function)Intlower,"lower"),methodClass());
+	iClass->methods[8] = newObject(newMethod((function)Intgreater,"greater"),methodClass());
 	iClass->methods[9] = newObject(newMethod((function)or,"or"),methodClass());
 	iClass->methods[10] = newObject(newMethod((function)and,"and"),methodClass());
 	iClass->methods[11] = newObject(newMethod((function)toStringInteger,"toString"),methodClass());
