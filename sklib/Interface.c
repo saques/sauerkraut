@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include "include/Object.h"
 #include "include/Integer.h"
 #include "include/String.h"
@@ -28,6 +29,21 @@ void *  printi(void * i) {
 	printf("%d\n", a);
 	return 0;
 }
+
+/* testing only */
+void * readi(void *i){
+	String *s=((String *)((Object *) i)->instance);
+	scanf("%s",s->s);
+	return 0;
+}
+
+void * read(){
+	char * rec = malloc(42); //MAGIC NUMBER
+	scanf("%s",rec);
+	return (void *)newObject(newString(rec),stringClass());
+}
+
+
 
 void * funcexec(void * o, char * name, void ** args, int nArgs){
 	return _funcexec(o, name, args, nArgs);

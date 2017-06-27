@@ -5,7 +5,7 @@ cd ..
 make
 ./sauerkraut $1 -o  archivo.ll
 clang archivo.ll sklib/sklib.a -o a.out
-if [$? -ne 0]
+if [ $? -ne 0 ]
 then
 	echo FAILED!!!
 else
