@@ -6,6 +6,7 @@
 #include "include/ErrorPrint.h"
 #include <string.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 
 
@@ -75,7 +76,7 @@ Object * Strlower(void * obj, void ** args, int nArgs){
 	Object * o = _funcexec((Object *)args[0],"toString",NULL,0);
 	String * other = (String *)(o->instance);
 
-	return newObject(newInteger(strcmp(this->s,other->s)),integerClass());
+	return newObject(newInteger(strcmp(this->s,other->s)<0),integerClass());
 }
 
 Object * Strgreater(void * obj, void ** args, int nArgs){
@@ -88,7 +89,7 @@ Object * Strgreater(void * obj, void ** args, int nArgs){
 	Object * o = _funcexec((Object *)args[0],"toString",NULL,0);
 	String * other = (String *)(o->instance);
 
-	return newObject(newInteger(strcmp(this->s,other->s)),integerClass());
+	return newObject(newInteger(strcmp(this->s,other->s)>0),integerClass());
 }
 
 /*
