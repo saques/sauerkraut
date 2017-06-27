@@ -117,6 +117,10 @@ VAR		:  VARKW IDENT
 		{
 			$$ = new VariableDeclarationNode(*$2, $4);
 		}
+		| VARKW IDENT '=' INSTR
+		{
+			$$ = new VariableDeclarationNode(*$2,(ExpressionNode *)new ExpressionStatementNode(*$4));
+		}
 		;
 
 FUNC	: FUNKW IDENT ARGS '{' ST '}'
@@ -317,7 +321,7 @@ KV_SET		: KV KV_SET | KV | /*empty*/ ;
 
 KV		: IDENT ':' VALUE ';' ;
 
-VALUE		: INT | STR | ARRAY | OBJECT ;
+VALUE		: INT | STR | ARRAY | OBJECT;
 
 %%
 void line(char * s){
