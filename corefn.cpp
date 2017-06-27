@@ -24,8 +24,18 @@ void appendIntInit(CodeGenContext * context, const char * name)
 	Function * function = Function::Create(ftype, GlobalValue::ExternalLinkage, name, context->module);
 }
 
+void appendStringInit(CodeGenContext * context, const char * name)
+{
+	vector<Type*> argTypes;
+	argTypes.push_back(PointerType::get(IntegerType::get(getGlobalContext(), 8), 0));
+	FunctionType *ftype = FunctionType::get(PointerType::get(IntegerType::get(getGlobalContext(), 8), 0),
+							makeArrayRef(argTypes), false);
+	Function * function = Function::Create(ftype, GlobalValue::ExternalLinkage, name, context->module);
+}
+
 void createCoreFunctions(CodeGenContext& context){
 	appendIntInit(&context, "newIntegerObj");
+	appendStringInit(&context, "newStringObj");
 	appendCoreFunction(&context, "printi", 1);
 	appendCoreFunction(&context,"print",1);
 }

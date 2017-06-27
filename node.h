@@ -41,6 +41,13 @@ public:
 	virtual llvm::Value * codeGen(CodeGenContext& context);
 };
 
+class StringNode :public ExpressionNode{
+public:
+	std::string s;
+	StringNode(const std::string& s) : s(s){}
+	virtual llvm::Value * codeGen(CodeGenContext& context);
+};
+
 class IntegerNode :public ExpressionNode{
 public:
 	int value;

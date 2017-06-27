@@ -69,6 +69,20 @@ Value* IntegerNode::codeGen(CodeGenContext& context)
 	return call;
 }
 
+Value* StringNode::codeGen(CodeGenContext& context)
+{
+	std::cerr << "Creating string: " << s << endl;
+	Function *function = context.module->getFunction("newStringObj");
+	if (function == NULL) {
+		std::cerr << "no such function (coreCoreFunctionFail) " << "newStringObj"<< endl;
+	}
+	std::vector<Value*> args;
+	ExpressionList::const_iterator it;
+	args.push_back(ConstantDataArray::getString(getGlobalContext(),s, true));
+	CallInst *call = CallInst::Create(function, makeArrayRef(args), "", context.currentBlock());
+	return call;
+}
+
 Value* IdentifierNode::codeGen(CodeGenContext& context)
 {
 	std::cerr << "Creating identifier reference: " << name << endl;
