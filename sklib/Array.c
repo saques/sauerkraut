@@ -70,7 +70,17 @@ static Class * arrClass = NULL;
 		 errorout("Array::toString expects 0 arguments");
 	 }
 	 Array * a = (Array *)((Object *)this)->instance;
-	 char * s = malloc(BUFSIZE);
+	 char * ans = malloc(BUFSIZE);
+	 strcpy(s,"[");
+	 int len=a->n;
+	 for(int i=0;i<len;i++){
+		Object * cache= (Object *)(a->objs[i]);
+		cache = ((Object *)_funcexec(cache,"toString",NULL,0));
+		String * s=(String *)cache->instance;
+		strcat(ans,s->s);
+		strcat(ans,",");
+	 }
+	 strcat(ans,"]");
 	 sprintf(s,"Array: Size = %d",a->n);
 	 return newObject(newString(s),stringClass());
  }

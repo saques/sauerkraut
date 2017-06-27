@@ -1,4 +1,4 @@
-var a = 2 + 2
+var a = 2 + 2 + 2
 
 print(a)
 a = 12-3
