@@ -122,6 +122,6 @@ public:
 class ReturnNode : public StatementNode {
 public:
 	ExpressionNode& expression;
-	ReturnNode(ExpressionNode& returnValue) : expression(expression) {}
+	ReturnNode(ExpressionNode& expression) : expression(expression) {}
 	virtual llvm::Value* codeGen(CodeGenContext& context);
 };

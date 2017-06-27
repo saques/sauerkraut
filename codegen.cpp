@@ -283,7 +283,9 @@ Value * FunctionDeclarationNode::codeGen(CodeGenContext& context)
 
 Value * ReturnNode::codeGen(CodeGenContext& context)
 {
+	printf("%d\n", expression);
 	Value *returnValue = expression.codeGen(context);
+	printf("generating return\n ");
 	if (context.getCurrentReturnValue() != NULL) {
 		std::cerr << "Compilation error: multiple return statements" << endl;
 		return NULL;

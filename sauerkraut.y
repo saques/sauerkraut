@@ -38,7 +38,7 @@ void yyerror(const char * s){
 %type <ident> 	IDENT
 %type <block> 	ST BLOCK
 %type <arg_list> ARGS ARGSET
-%type <expr>	INSTR VALUE INT CALL I STR
+%type <expr>	INSTR VALUE INT CALL I STR ASSIGN
 %type <expr_list> PASSEDARGS
 %type <i> INTEGER EXTERN_FUNC_ARGS
 %type <s> ID STRING
@@ -219,11 +219,15 @@ I2		:  I '<' I
 		 | I AND I
 		 ;
 
-ASSIGN		: IDENT '=' I ;
+ASSIGN		: IDENT '=' INSTR
+			{
+				$$ = new AssignmentNode(*$1, *$3);
+			};
 
 
 I		:  I '+' I
 		{
+
 			$$ = new BinaryOperationNode(*$1, *$3);
 		}
 		 | I '-' I
