@@ -9,3 +9,4 @@ tokens.cpp
 sauerkraut.cpp
 sauerkraut.hpp
 *.a
+*.out

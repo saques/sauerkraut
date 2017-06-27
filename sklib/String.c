@@ -1,8 +1,11 @@
 #include <String.h>
+#include <Integer.h>
 #include <Class.h>
 #include <Method.h>
+#include <ErrorPrint.h>
 #include <string.h>
 #include <stdlib.h>
+#include <string.h>
 
 
 static Class * sClass = NULL;
@@ -10,11 +13,24 @@ static Class * sClass = NULL;
 /*
  * METHODS FOR String
  */
-const static int NMETHODS = 5;
+const static int NMETHODS = 2;
 
-//[this]
 Object * toStringString(void * obj, void ** args, int nArgs){
+	if(nArgs!=0){
+		errorout("String::toString expects 0 arguments");
+		exit(1);
+	}
 	return (Object *)obj;
+}
+
+Object * toIntString(void * obj, void ** args, int nArgs){
+	if(nArgs!=0){
+		errorout("String::toInt expects 0 arguments");
+		exit(1);
+	}
+	String * this = (String *)((Object *)obj)->instance;
+	int i = strlen(this->s);
+	return newObject(newInteger(i),integerClass());
 }
 
 /*
@@ -29,6 +45,7 @@ Class * stringClass(){
 	sClass = newClass(STRING,NMETHODS);
 
 	sClass->methods[0] = newObject(newMethod((function)toStringString,"toString"),methodClass());
+	sClass->methods[0] = newObject(newMethod((function)toIntString,"toInt"),methodClass());
 
 	return sClass;
 }

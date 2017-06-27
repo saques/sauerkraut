@@ -1,6 +1,7 @@
 #include <Method.h>
 #include <Object.h>
 #include <Integer.h>
+#include <Array.h>
 #include <String.h>
 #include <stdio.h>
 
@@ -18,8 +19,7 @@ void * newKVObjectObj(char ** keys, void ** vals, int n){
 }
 
 void * newArrayObj(void ** vals, int n){
-	//TODO
-	return 0;
+	return (void *)newObject(newArray(vals,n),arrayClass());
 }
 
 /* debug only -> remember to do proper print */
@@ -29,8 +29,7 @@ void *  printi(void * i) {
 	return 0;
 }
 
-void * funcexec(void * o, char * name, void ** args, int nArgs)
-{
+void * funcexec(void * o, char * name, void ** args, int nArgs){
 	return _funcexec(o, name, args, nArgs);
 }
 void * print(void * v){
