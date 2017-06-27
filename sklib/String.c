@@ -14,7 +14,7 @@ static Class * sClass = NULL;
 /*
  * METHODS FOR String
  */
-const static int NMETHODS = 3;
+const static int NMETHODS = 6;
 
 Object * toStringString(void * obj, void ** args, int nArgs){
 	if(nArgs!=0){
@@ -52,6 +52,45 @@ Object * sumString(void * obj, void ** args, int nArgs){
 	return newObject(newString(ans),stringClass());
 }
 
+Object * Strequal(void * obj, void ** args, int nArgs){
+	if(nArgs!=1){
+		errorout("String::sum expects 1 arguments");
+		exit(1);
+	}
+	String * this = (String *)((Object *)obj)->instance;
+
+	Object * o = _funcexec((Object *)args[0],"toString",NULL,0);
+	String * other = (String *)(o->instance);
+
+	return newObject(newInteger(strcmp(this->s,other->s)==0),integerClass());
+}
+
+Object * Strlower(void * obj, void ** args, int nArgs){
+	if(nArgs!=1){
+		errorout("String::sum expects 1 arguments");
+		exit(1);
+	}
+	String * this = (String *)((Object *)obj)->instance;
+
+	Object * o = _funcexec((Object *)args[0],"toString",NULL,0);
+	String * other = (String *)(o->instance);
+
+	return newObject(newInteger(strcmp(this->s,other->s)),integerClass());
+}
+
+Object * Strgreater(void * obj, void ** args, int nArgs){
+	if(nArgs!=1){
+		errorout("String::sum expects 1 arguments");
+		exit(1);
+	}
+	String * this = (String *)((Object *)obj)->instance;
+
+	Object * o = _funcexec((Object *)args[0],"toString",NULL,0);
+	String * other = (String *)(o->instance);
+
+	return newObject(newInteger(strcmp(this->s,other->s)),integerClass());
+}
+
 /*
  * END METHODS FOR String
  */
@@ -65,7 +104,10 @@ Class * stringClass(){
 
 	sClass->methods[0] = newObject(newMethod((function)toStringString,"toString"),methodClass());
 	sClass->methods[1] = newObject(newMethod((function)toIntString,"toInt"),methodClass());
-	sClass->methods[2] = newObject(newMethod((function)sumString,"sum"),methodClass());
+	sClass->methods[2] = newObject(newMethod((function)Strequal,"equal"),methodClass());
+	sClass->methods[3] = newObject(newMethod((function)Strlower,"lower"),methodClass());
+	sClass->methods[4] = newObject(newMethod((function)Strgreater,"greater"),methodClass());
+	sClass->methods[5] = newObject(newMethod((function)sumString,"sum"),methodClass());
 
 	return sClass;
 }
