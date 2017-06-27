@@ -14,7 +14,7 @@ const static int NMETHODS = 5;
 
 //[this]
 Object * toStringString(void * obj, void ** args, int nArgs){
-	return args[nArgs];
+	return (Object *)obj;
 }
 
 /*

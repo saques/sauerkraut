@@ -4,6 +4,7 @@
 #include <deque>
 using namespace std;
 
+Value * createCharArray(CodeGenContext& context, std::string stri);
 
 /* Compile the AST into a module */
 bool CodeGenContext::generateCode(BlockNode& root, raw_ostream * out)
@@ -78,7 +79,7 @@ Value* StringNode::codeGen(CodeGenContext& context)
 	}
 	std::vector<Value*> args;
 	ExpressionList::const_iterator it;
-	args.push_back(ConstantDataArray::getString(getGlobalContext(),s, true));
+	args.push_back(createCharArray(context,s));
 	CallInst *call = CallInst::Create(function, makeArrayRef(args), "", context.currentBlock());
 	return call;
 }

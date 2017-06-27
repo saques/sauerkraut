@@ -228,7 +228,8 @@ I		:  I '+' I
 		 | I OR I
 		 | I AND I
 		 | IDENT
-		 | INT ;
+		 | INT 
+		 | STR;
 
 OBJECT		: '{' KV_SET '}' ;
 

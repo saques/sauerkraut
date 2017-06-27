@@ -20,7 +20,7 @@ const static int NMETHODS = 1;
 
 //[args(0)...args(nArgs-1),this]
 Object * execute(void *arg, void ** args, int nArgs){
-	Method * f = (Method *)(((Object *)args[nArgs])->instance);
+	Method * f = (Method *)(((Object *)arg)->instance);
 	return f->f(arg, args,nArgs);
 }
 

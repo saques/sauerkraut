@@ -18,7 +18,10 @@ const static int NMETHODS = 6;
 
 //[this]
 Object * toStringInteger(void * obj, void ** args, int nArgs){
-	Integer * this = (Integer *)(((Object *)args[nArgs])->instance);
+	if(nArgs!=0){
+		exit(1);
+	}
+	Integer * this = (Integer *)(((Object *)obj)->instance);
 	char * s = malloc(BUFSIZE);
 	snprintf(s,BUFSIZE,"%d",this->i);
 	return newObject(newString(s),stringClass());
@@ -39,7 +42,7 @@ Object * subtract(void * obj, void ** args, int nArgs){
 	if(nArgs!=1){
 		exit(1);
 	}
-	Integer * this = (Integer *)(((Object *)args[1])->instance);
+	Integer * this = (Integer *)(((Object *)obj)->instance);
 	Integer * other = (Integer *)(((Object *)args[0])->instance);
 	return newObject(newInteger(this->i-other->i),integerClass());
 }
@@ -49,7 +52,7 @@ Object * multiply(void * obj, void ** args, int nArgs){
 	if(nArgs!=1){
 		exit(1);
 	}
-	Integer * this = (Integer *)(((Object *)args[1])->instance);
+	Integer * this = (Integer *)(((Object *)obj)->instance);
 	Integer * other = (Integer *)(((Object *)args[0])->instance);
 	return newObject(newInteger(this->i*other->i),integerClass());
 }
@@ -59,7 +62,7 @@ Object * divide(void * obj, void ** args, int nArgs){
 	if(nArgs!=1){
 		exit(1);
 	}
-	Integer * this = (Integer *)(((Object *)args[1])->instance);
+	Integer * this = (Integer *)(((Object *)obj)->instance);
 	Integer * other = (Integer *)(((Object *)args[0])->instance);
 	return newObject(newInteger(this->i/other->i),integerClass());
 }
@@ -69,7 +72,7 @@ Object * modulo(void * obj,void ** args, int nArgs){
 	if(nArgs!=1){
 		exit(1);
 	}
-	Integer * this = (Integer *)(((Object *)args[1])->instance);
+	Integer * this = (Integer *)(((Object *)obj)->instance);
 	Integer * other = (Integer *)(((Object *)args[0])->instance);
 	return newObject(newInteger(this->i%other->i),integerClass());
 }
