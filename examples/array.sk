@@ -2,6 +2,10 @@ var arr = [ "hola" , 2 , [ "array" ] ]
 
 print(arr)
 
+arr = arr + ["otro array"]
+
+print(arr)
+
 arr = 5 + arr
 
 print(arr)

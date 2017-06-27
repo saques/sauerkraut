@@ -17,7 +17,7 @@ static Class * arrClass = NULL;
  * METHODS FOR Array
  */
  
- const static int NMETHODS = 5;
+ const static int NMETHODS = 6;
  
  Object * sizeArr(void * this, void ** args, int nArgs){
 	 if(nArgs!=0){
@@ -98,6 +98,22 @@ static Class * arrClass = NULL;
 	 return newObject(newString(ans),stringClass());
  }
  
+ Object * sumArr(void * this, void ** args, int nArgs){
+	 if(nArgs != 1){
+		 errorout("Array::sum expects 1 argument");
+	 }
+	 Array * a = (Array *)((Object *)this)->instance;
+	 Object * val = (Object *)args[0];
+	 
+	 /*
+	  * Efficiency FTW
+	  */
+	 a->objs = (Object **)realloc(a->objs,a->n+1);
+	 a->objs[a->n] = val;
+	 a->n++;
+	 return (Object *)this;
+ }
+ 
  
  /*
   * END METHODS FOR Array
@@ -114,6 +130,7 @@ Class * arrayClass(){
 	arrClass->methods[2] = newObject(newMethod((function)setArr,"set"),methodClass());
 	arrClass->methods[3] = newObject(newMethod((function)toIntArr,"toInt"),methodClass());
 	arrClass->methods[4] = newObject(newMethod((function)toStringArr,"toString"),methodClass());
+	arrClass->methods[5] = newObject(newMethod((function)sumArr,"sum"),methodClass());
 
 	return arrClass;
 }
