@@ -16,7 +16,7 @@ static Class * iClass = NULL;
 /*
  * METHODS FOR Integer
  */
-const static int NMETHODS = 7;
+const static int NMETHODS = 13;
 
 Object * toStringInteger(void * obj, void ** args, int nArgs){
 	if(nArgs!=0){
@@ -43,10 +43,10 @@ Object * sum(void * obj,void ** args, int nArgs){
 		exit(1);
 	}
 	Integer * this = (Integer *)(((Object *)obj)->instance);
-	
+
 	Object * o = _funcexec((Object *)args[0],"toInt",NULL,0);
 	Integer * other = (Integer *)(o->instance);
-	
+
 	return newObject(newInteger(this->i+other->i),integerClass());
 }
 
@@ -56,10 +56,10 @@ Object * subtract(void * obj, void ** args, int nArgs){
 		exit(1);
 	}
 	Integer * this = (Integer *)(((Object *)obj)->instance);
-	
+
 	Object * o = _funcexec((Object *)args[0],"toInt",NULL,0);
 	Integer * other = (Integer *)(o->instance);
-	
+
 	return newObject(newInteger(this->i-other->i),integerClass());
 }
 
@@ -69,10 +69,10 @@ Object * multiply(void * obj, void ** args, int nArgs){
 		exit(1);
 	}
 	Integer * this = (Integer *)(((Object *)obj)->instance);
-	
+
 	Object * o = _funcexec((Object *)args[0],"toInt",NULL,0);
 	Integer * other = (Integer *)(o->instance);
-	
+
 	return newObject(newInteger(this->i*other->i),integerClass());
 }
 
@@ -82,10 +82,10 @@ Object * divide(void * obj, void ** args, int nArgs){
 		exit(1);
 	}
 	Integer * this = (Integer *)(((Object *)obj)->instance);
-	
+
 	Object * o = _funcexec((Object *)args[0],"toInt",NULL,0);
 	Integer * other = (Integer *)(o->instance);
-	
+
 	return newObject(newInteger(this->i/other->i),integerClass());
 }
 
@@ -95,11 +95,89 @@ Object * modulo(void * obj,void ** args, int nArgs){
 		exit(1);
 	}
 	Integer * this = (Integer *)(((Object *)obj)->instance);
-	
+
 	Object * o = _funcexec((Object *)args[0],"toInt",NULL,0);
 	Integer * other = (Integer *)(o->instance);
-	
+
 	return newObject(newInteger(this->i%other->i),integerClass());
+}
+
+//[other,this]
+Object * equal(void * obj,void ** args, int nArgs){
+    if(nArgs!=1){
+        errorout("Integer::equal expects 1 argument");
+        exit(1);
+    }
+    Integer * this = (Integer *)(((Object *)obj)->instance);
+
+    Object * o = _funcexec((Object *)args[0],"toInt",NULL,0);
+    Integer * other = (Integer *)(o->instance);
+
+    return newObject(newInteger(this->i==other->i),integerClass());
+}
+//[other,this]
+Object * lower(void * obj,void ** args, int nArgs){
+    if(nArgs!=1){
+        errorout("Integer::lower expects 1 argument");
+        exit(1);
+    }
+    Integer * this = (Integer *)(((Object *)obj)->instance);
+
+    Object * o = _funcexec((Object *)args[0],"toInt",NULL,0);
+    Integer * other = (Integer *)(o->instance);
+
+    return newObject(newInteger(this->i<other->i),integerClass());
+}
+//[other,this]
+Object * greater(void * obj,void ** args, int nArgs){
+    if(nArgs!=1){
+        errorout("Integer::greater expects 1 argument");
+        exit(1);
+    }
+    Integer * this = (Integer *)(((Object *)obj)->instance);
+
+    Object * o = _funcexec((Object *)args[0],"toInt",NULL,0);
+    Integer * other = (Integer *)(o->instance);
+
+    return newObject(newInteger(this->i>other->i),integerClass());
+}
+
+//[other,this]
+Object * or(void * obj,void ** args, int nArgs){
+    if(nArgs!=1){
+        errorout("Integer::or expects 1 argument");
+        exit(1);
+    }
+    Integer * this = (Integer *)(((Object *)obj)->instance);
+
+    Object * o = _funcexec((Object *)args[0],"toInt",NULL,0);
+    Integer * other = (Integer *)(o->instance);
+
+    return newObject(newInteger(this->i||other->i),integerClass());
+}
+
+//[other,this]
+Object * and(void * obj,void ** args, int nArgs){
+    if(nArgs!=1){
+        errorout("Integer::and expects 1 argument");
+        exit(1);
+    }
+    Integer * this = (Integer *)(((Object *)obj)->instance);
+
+    Object * o = _funcexec((Object *)args[0],"toInt",NULL,0);
+    Integer * other = (Integer *)(o->instance);
+
+    return newObject(newInteger(this->i&&other->i),integerClass());
+}
+
+//[other,this]
+Object * not(void * obj,void ** args, int nArgs){
+    if(nArgs!=0){
+        errorout("Integer::not expects 0 argument");
+        exit(1);
+    }
+    Integer * this = (Integer *)(((Object *)obj)->instance);
+    return newObject(newInteger(!this->i),integerClass());
 }
 /*
  * END METHODS FOR Integer
@@ -116,8 +194,14 @@ Class * integerClass(){
 	iClass->methods[2] = newObject(newMethod((function)multiply,"multiply"),methodClass());
 	iClass->methods[3] = newObject(newMethod((function)divide,"divide"),methodClass());
 	iClass->methods[4] = newObject(newMethod((function)modulo,"modulo"),methodClass());
-	iClass->methods[5] = newObject(newMethod((function)toStringInteger,"toString"),methodClass());
-	iClass->methods[6] = newObject(newMethod((function)toIntInteger,"toInt"),methodClass());
+	iClass->methods[5] = newObject(newMethod((function)equal,"equal"),methodClass());
+	iClass->methods[6] = newObject(newMethod((function)not,"not"),methodClass());
+	iClass->methods[7] = newObject(newMethod((function)lower,"lower"),methodClass());
+	iClass->methods[8] = newObject(newMethod((function)greater,"greater"),methodClass());
+	iClass->methods[9] = newObject(newMethod((function)or,"or"),methodClass());
+	iClass->methods[10] = newObject(newMethod((function)and,"and"),methodClass());
+	iClass->methods[11] = newObject(newMethod((function)toStringInteger,"toString"),methodClass());
+    iClass->methods[12] = newObject(newMethod((function)toIntInteger,"toInt"),methodClass());
 
 	return iClass;
 }

@@ -3,6 +3,12 @@
 #include <stdlib.h>
 #include "node.h"
 #include <deque>
+#define LOWER(a,b) new BinaryOperationNode(a, b,"lower")
+#define GREATER(a,b) new BinaryOperationNode(a, b,"greater")
+#define EQUAL(a,b) new BinaryOperationNode(a, b,"equal")
+#define NOT(a) new UnaryOperationNode(a,std::string("not"))
+
+
 
 void line(char * s);
 
@@ -270,13 +276,37 @@ I		:  I '+' I
             $$ = new BinaryOperationNode(*$1, *$3,"divide");
          }
 		 | I '<' I
+		 {
+            $$ = LOWER(*$1,*$3);
+         }
 		 | I '>' I
+		 {
+            $$ = GREATER(*$1,*$3);
+         }
 		 | I LE I
+		 {
+            $$ = NOT(*(GREATER(*$1,*$3)));
+         }
 		 | I GE I
+		 {
+            $$ = NOT(*(LOWER(*$1,*$3)));
+         }
 		 | I EQ I
+		 {
+            $$ = EQUAL(*$1,*$3);
+         }
 		 | I NE I
+		 {
+            $$ = NOT(*(EQUAL(*$1,*$3)));
+         }
 		 | I OR I
+		 {
+            $$ = new BinaryOperationNode(*$1, *$3,"or");
+         }
 		 | I AND I
+		 {
+            $$ = new BinaryOperationNode(*$1, *$3,"and");
+         }
 		 | IDENT
 		 | INT
 		 | STR;
