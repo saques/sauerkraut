@@ -32,9 +32,9 @@ void yyerror(const char * s){
 	int i;
 	char * s;
 }
-%token ID INTEGER STRING VARKW FUNKW END LE GE EQ NE OR AND WHILEKW EXTERNKW
+%token ID INTEGER STRING VARKW FUNKW END LE GE EQ NE OR AND WHILEKW EXTERNKW RETKW
 
-%type <st>	    FUNC VAR EXPR EXTERN_FUNC
+%type <st>	    FUNC VAR EXPR EXTERN_FUNC RET
 %type <ident> 	IDENT
 %type <block> 	ST BLOCK
 %type <arg_list> ARGS ARGSET
@@ -77,11 +77,21 @@ ST		: EXPR ST
 			$$ = $2;
 			$2->statements.push_front($<st>1);
 		}
+		| RET
+		{
+			$$ = new BlockNode();
+			$$->statements.push_front($<st>1);
+		}
 		| /*empty*/
 		{
 			$$ = new BlockNode();
 		}
 		;
+
+RET		: RETKW INSTR
+		{
+			$$ = new ReturnNode(*$2);
+		}
 
 EXPR	: INSTR
 		{
@@ -228,7 +238,7 @@ I		:  I '+' I
 		 | I OR I
 		 | I AND I
 		 | IDENT
-		 | INT 
+		 | INT
 		 | STR;
 
 OBJECT		: '{' KV_SET '}' ;

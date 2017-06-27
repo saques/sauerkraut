@@ -118,3 +118,10 @@ public:
 		lhs(lhs), rhs(rhs) {}
 	virtual llvm::Value * codeGen(CodeGenContext& context);
 };
+
+class ReturnNode : public StatementNode {
+public:
+	ExpressionNode& expression;
+	ReturnNode(ExpressionNode& returnValue) : expression(expression) {}
+	virtual llvm::Value* codeGen(CodeGenContext& context);
+};

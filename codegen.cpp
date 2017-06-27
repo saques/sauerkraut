@@ -248,10 +248,11 @@ Value * FunctionDeclarationNode::codeGen(CodeGenContext& context)
 {
 	vector<Type*> argTypes;
 	VariableList::const_iterator it;
+	Type * voidp = PointerType::get(IntegerType::get(getGlobalContext(), 8), 0);
 	for (it = arguments->begin(); it != arguments->end(); it++) {
-		argTypes.push_back(Type::getInt64Ty(getGlobalContext()));
+		argTypes.push_back(voidp);
 	}
-	FunctionType *ftype = FunctionType::get(Type::getInt64Ty(getGlobalContext()), makeArrayRef(argTypes), false);
+	FunctionType *ftype = FunctionType::get(voidp, makeArrayRef(argTypes), false);
 	Function *function = Function::Create(ftype, GlobalValue::InternalLinkage, id.name, context.module);
 	BasicBlock *bblock = BasicBlock::Create(getGlobalContext(), "entry", function, 0);
 
@@ -278,4 +279,16 @@ Value * FunctionDeclarationNode::codeGen(CodeGenContext& context)
 	context.popBlock();
 	std::cerr << "Creating function: " << id.name << endl;
 	return function;
+}
+
+Value * ReturnNode::codeGen(CodeGenContext& context)
+{
+	Value *returnValue = expression.codeGen(context);
+	if (context.getCurrentReturnValue() != NULL) {
+		std::cerr << "Compilation error: multiple return statements" << endl;
+		return NULL;
+	} else {
+		context.setCurrentReturnValue(returnValue);
+		return returnValue;
+	}
 }
