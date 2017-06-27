@@ -11,3 +11,4 @@ sauerkraut.hpp
 *.a
 *.out
 CMakeLists.txt
+ota_*.*
