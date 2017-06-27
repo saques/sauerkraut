@@ -6,6 +6,7 @@
 #include <ErrorPrint.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 #define BUFSIZE 32
 
@@ -71,7 +72,7 @@ static Class * arrClass = NULL;
 	 }
 	 Array * a = (Array *)((Object *)this)->instance;
 	 char * ans = malloc(BUFSIZE);
-	 strcpy(s,"[");
+	 strcpy(ans,"[");
 	 int len=a->n;
 	 for(int i=0;i<len;i++){
 		Object * cache= (Object *)(a->objs[i]);
@@ -81,8 +82,8 @@ static Class * arrClass = NULL;
 		strcat(ans,",");
 	 }
 	 strcat(ans,"]");
-	 sprintf(s,"Array: Size = %d",a->n);
-	 return newObject(newString(s),stringClass());
+	 //sprintf(ans,"Array: Size = %d",a->n);
+	 return newObject(newString(ans),stringClass());
  }
  
  

@@ -5,6 +5,7 @@
 #include "include/String.h"
 #include "include/Method.h"
 #include "include/Array.h"
+#define INT_0 (void *)newObject(newInteger(0),integerClass())
 
 void * newIntegerObj(int i){
 	return (void *)newObject(newInteger(i),integerClass());
@@ -34,7 +35,7 @@ void *  printi(void * i) {
 void * readi(void *i){
 	String *s=((String *)((Object *) i)->instance);
 	scanf("%s",s->s);
-	return 0;
+	return INT_0;
 }
 
 void * read(){
