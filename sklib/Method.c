@@ -1,6 +1,6 @@
-#include <Method.h>
-#include <Class.h>
-#include <Object.h>
+#include "include/Method.h"
+#include "include/Class.h"
+#include "include/Object.h"
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>

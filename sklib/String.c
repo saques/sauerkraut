@@ -1,6 +1,7 @@
-#include <String.h>
-#include <Class.h>
-#include <Method.h>
+#include "include/String.h"
+#include "include/Class.h"
+#include "include/Method.h"
+#include "include/Object.h"
 #include <string.h>
 #include <stdlib.h>
 

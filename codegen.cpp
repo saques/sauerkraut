@@ -64,7 +64,6 @@ Value* IntegerNode::codeGen(CodeGenContext& context)
 		std::cerr << "no such function (coreCoreFunctionFail) " << "newIntegerObj"<< endl;
 	}
 	std::vector<Value*> args;
-	ExpressionList::const_iterator it;
 	args.push_back(ConstantInt::get(Type::getInt64Ty(getGlobalContext()), value, true));
 	CallInst *call = CallInst::Create(function, makeArrayRef(args), "", context.currentBlock());
 	return call;
@@ -78,7 +77,6 @@ Value* StringNode::codeGen(CodeGenContext& context)
 		std::cerr << "no such function (coreCoreFunctionFail) " << "newStringObj"<< endl;
 	}
 	std::vector<Value*> args;
-	ExpressionList::const_iterator it;
 	args.push_back(createCharArray(context,s));
 	CallInst *call = CallInst::Create(function, makeArrayRef(args), "", context.currentBlock());
 	return call;
@@ -222,7 +220,7 @@ Value * BinaryOperationNode::codeGen(CodeGenContext& context)
 	auto zero = ConstantInt::get(getGlobalContext(), llvm::APInt(64, 0, true));
 	auto index = ConstantInt::get(getGlobalContext(), llvm::APInt(32, 0, true));
 	/* push function name (sum) */
-	args.push_back(createCharArray(context, "sum"));
+	args.push_back(createCharArray(context, methodName.c_str()));
 	// std::vector<Value *> funargs;
 	// funargs.push_back(rhs.codeGen(context));
 	/* push function arguments {rhs exprssion} */

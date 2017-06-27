@@ -1,3 +1,5 @@
 var a = 2 + 2
 
 printi(a)
+var a = 12 - 3
+printi(a)
