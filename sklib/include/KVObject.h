@@ -3,14 +3,8 @@
 
 #include <Class.h>
 
-typedef struct Pair{
-	Object * key; /*String*/
-	Object * value; /*any*/
-} Pair;
-
 typedef struct KVObject {
-	Pair ** pairs;
-	int n;
+	struct lh_table * table;
 } KVObject;
 
 Class * KVObjectClass();

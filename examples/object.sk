@@ -1,6 +1,28 @@
 
 var obj = { "cinco" : 5 ; }
 
+print("size must be 1, and it's in fact: " + obj.size())
 
 print(obj.contains("cinco"))
+print(obj.contains("dos"))
 
+print("put dos, [2]")
+obj.put("dos",[2])
+print("contains dos: " + obj.contains("dos"))
+
+print("put cinco, []")
+obj.put("cinco",[])
+print("get cinco: " + obj.get("cinco"))
+
+print("get dos")
+print(obj.get("dos"))
+
+print("remove dos")
+print(obj.remove("dos"))
+print(obj.contains("dos"))
+
+print("remove cinco")
+print(obj.remove("cinco"))
+print(obj.contains("cinco"))
+
+print("removed all elements, size should be: " + obj.size())

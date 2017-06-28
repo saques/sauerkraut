@@ -8,6 +8,12 @@
 #include "include/Method.h"
 #include "include/ErrorPrint.h"
 #include "include/KVObject.h"
+#include "include/linear_hash.h"
+
+typedef struct Pair{
+	Object * key; /*String*/
+	Object * value; /*any*/
+} Pair;
 
 static Class * kvClass = NULL;
 
@@ -15,7 +21,7 @@ static Class * kvClass = NULL;
  * METHODS FOR KVObject
  */
 
-const static int NMETHODS = 1;
+const static int NMETHODS = 5;
 
 Object * contains(void * this, void ** args, int nArgs){
 	if(nArgs!=1){
@@ -27,14 +33,78 @@ Object * contains(void * this, void ** args, int nArgs){
 	Object * o = _funcexec((Object *)args[0],"toString",NULL,0);
 	String * other = (String *)(o->instance);
 	
-	for(int i=0; i<kv->n; i++){
-		Pair * p = kv->pairs[i];
-		String * key = (String*)_funcexec(p->key,"toString",NULL,0)->instance;
-		if(strcmp((const char*)key->s,(const char*)other->s)==0){
-			return newObject(newInteger(1),integerClass());
-		}
+	int ret = lh_exists(kv->table, (const char *)other->s);
+	
+	return newObject(newInteger(ret),integerClass());
+}
+
+Object * putObj(void * this, void ** args, int nArgs){
+	if(nArgs!=2){
+		errorout("Object::put expects 2 arguments");
+		exit(1);
 	}
-	return newObject(newInteger(0),integerClass());
+	
+	KVObject * kv = (KVObject *)((Object *)this)->instance;
+	
+	Object * o_key = _funcexec((Object *)args[0],"toString",NULL,0);
+	String * key = (String *)(o_key->instance);
+	Object * o_val = (Object *)args[1];
+	
+	Pair * p = (Pair*)lh_get(kv->table, (const char *)key->s);
+	if(p==0) {
+		Pair * p = malloc(sizeof(Pair));
+		p->key=o_key;
+		p->value=o_val;
+		lh_insert(kv->table, (const char*)key->s, (void*)p);
+	} else {
+		p->value=o_val;
+	}
+	return (Object *)this;
+}
+
+Object * getObj(void * this, void ** args, int nArgs){
+	if(nArgs!=1){
+		errorout("Object::get expects 1 argument");
+		exit(1);
+	}
+	
+	KVObject * kv = (KVObject *)((Object *)this)->instance;
+	
+	Object * o_key = _funcexec((Object *)args[0],"toString",NULL,0);
+	String * key = (String *)(o_key->instance);
+	
+	Pair * p = (Pair*)lh_get(kv->table, (const char *)key->s);
+	
+	if(p==0) {
+		return newObject(newInteger(0),integerClass());
+	}
+	return p->value;
+}
+
+Object * removeObj(void * this, void ** args, int nArgs){
+	if(nArgs!=1){
+		errorout("Object::remove expects 1 argument");
+		exit(1);
+	}
+	KVObject * kv = (KVObject *)((Object *)this)->instance;
+	
+	Object * o_key = _funcexec((Object *)args[0],"toString",NULL,0);
+	String * key = (String *)(o_key->instance);
+	
+	Pair * p = (Pair*)lh_delete(kv->table, (const char *)key->s);
+	if(p==0){
+		return newObject(newInteger(0),integerClass());
+	}
+	return p->value;
+}
+
+Object * sizeObj(void * this, void ** args, int nArgs){
+	if(nArgs!=0){
+		errorout("Object::size expects 0 arguments");
+		exit(1);
+	}
+	KVObject * kv = (KVObject *)((Object *)this)->instance;
+	return newObject(newInteger(lh_nelems(kv->table)),integerClass());
 }
 
 
@@ -51,6 +121,10 @@ Class * KVObjectClass(){
 	kvClass = newClass(OBJECT,NMETHODS);
 
 	kvClass->methods[0] = newObject(newMethod((function)contains,"contains"),methodClass());
+	kvClass->methods[1] = newObject(newMethod((function)putObj,"put"),methodClass());
+	kvClass->methods[2] = newObject(newMethod((function)getObj,"get"),methodClass());
+	kvClass->methods[3] = newObject(newMethod((function)removeObj,"remove"),methodClass());
+	kvClass->methods[4] = newObject(newMethod((function)sizeObj,"size"),methodClass());
 
 	return kvClass;
 }
@@ -58,14 +132,18 @@ Class * KVObjectClass(){
 KVObject * newKVObject(void ** keys, void ** vals, int n){
 	KVObject * ans = (KVObject *)malloc(sizeof(KVObject));
 	
-	ans->pairs = malloc(sizeof(Pair*)*n);
+	ans->table = lh_new();
 	
 	for(int i=0; i<n; i++){
 		Pair * p = (Pair *)malloc(sizeof(Pair));
 		p->key=(Object *)keys[i];
 		p->value=(Object *)vals[i];
-		ans->pairs[i]=p;
+		String * key = (String *)(p->key->instance);
+		if(!lh_exists(ans->table,(const char*)key->s)) {
+			lh_insert(ans->table, (const char*)key->s, (void*)p);
+		} else {
+			lh_update(ans->table, (const char*)key->s, (void*)p);
+		}
 	}
-	ans->n = n;
 	return ans;
 }
