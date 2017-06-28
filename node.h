@@ -119,6 +119,15 @@ public:
 	virtual llvm::Value* codeGen(CodeGenContext& context);
 };
 
+class KVObjectCreationNode : public ExpressionNode {
+public:
+	ExpressionList keys;
+	ExpressionList values;
+	KVObjectCreationNode(ExpressionList& keys, ExpressionList& values) :
+		keys(keys), values(values) { }
+	virtual llvm::Value* codeGen(CodeGenContext& context);
+};
+
 class FunctionDeclarationNode : public StatementNode {
 public:
 	IdentifierNode& id;

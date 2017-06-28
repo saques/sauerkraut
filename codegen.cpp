@@ -126,6 +126,27 @@ Value* ArrayCreationNode::codeGen(CodeGenContext& context)
 	return call;
 }
 
+
+Value* KVObjectCreationNode::codeGen(CodeGenContext& context)
+{
+	std::cerr << "Creating object" << endl;
+	Function *function = context.module->getFunction("newKVObjectObj");
+	if (function == NULL) {
+		std::cerr << "no such function (coreCoreFunctionFail) " << "newKVObjectObj"<< endl;
+	}
+	
+	std::vector<Value*> args;
+	
+	args.push_back(expressionListPointerArray(context,keys));
+	args.push_back(expressionListPointerArray(context,values));
+	
+	args.push_back(ConstantInt::get(Type::getInt64Ty(getGlobalContext()), keys.size(), true));
+	
+	CallInst *call = CallInst::Create(function, makeArrayRef(args), "", context.currentBlock());
+	return call;
+}
+
+
 Value* IdentifierNode::codeGen(CodeGenContext& context)
 {
 	std::cerr << "Creating identifier reference: " << name << endl;

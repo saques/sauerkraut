@@ -5,6 +5,7 @@
 #include "include/String.h"
 #include "include/Method.h"
 #include "include/Array.h"
+#include "include/KVObject.h"
 #define INT0 (void *)newObject(newInteger(0),integerClass())
 #define BUFSIZE 32
 
@@ -16,9 +17,8 @@ void * newStringObj(const char * s){
 	return (void *)newObject(newString(s),stringClass());
 }
 
-void * newKVObjectObj(char ** keys, void ** vals, int n){
-	//TODO
-	return INT0;
+void * newKVObjectObj(void ** keys, void ** vals, int n){
+	return (void *)newObject(newKVObject(keys,vals,n),KVObjectClass());
 }
 
 void * newArrayObj(void ** vals, int n){

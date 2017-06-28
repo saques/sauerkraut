@@ -33,6 +33,7 @@ void yyerror(const char * s){
 	BlockNode *block;
 	IdentifierNode *ident;
 	VariableDeclarationNode *var_decl;
+	KVObjectCreationNode * obj_cr;
 	std::deque<VariableDeclarationNode*> *arg_list;
 	std::deque<ExpressionNode*> *expr_list;
 	std::deque<ExpressionNode*> *arr_list;
@@ -45,7 +46,8 @@ void yyerror(const char * s){
 %type <ident> 	IDENT
 %type <block> 	ST BLOCK
 %type <arg_list> ARGS ARGSET
-%type <expr>	INSTR VALUE INT CALL I STR ASSIGN ARRAY
+%type <expr>	INSTR VALUE INT CALL I STR ASSIGN ARRAY OBJECT
+%type <obj_cr>  KV_SET
 %type <expr_list> PASSEDARGS
 %type <i> INTEGER EXTERN_FUNC_ARGS
 %type <s> ID STRING
@@ -126,6 +128,33 @@ FUNC	: FUNKW IDENT ARGS '{' ST '}'
 		}
 		;
 		
+		
+OBJECT		: '{' KV_SET '}' 
+			 {
+				$$ = $2;
+			 }
+			 |'{' '}'
+			 {
+				ExpressionList * keys = new ExpressionList();
+				ExpressionList * values = new ExpressionList();
+				$$ = new KVObjectCreationNode(*keys,*values);
+			 };
+
+KV_SET		:  STR ':' I ';' KV_SET
+			 {
+				$$ = $5;
+				$$->keys.push_front($1);
+				$$->values.push_front($3);
+			 }
+             | STR ':' I ';'  
+             {
+				ExpressionList * keys = new ExpressionList();
+				ExpressionList * values = new ExpressionList();
+				keys->push_front($1);
+				values->push_front($3);
+				$$ = new KVObjectCreationNode(*keys,*values);
+             };
+			
 		
 ARRAY		: '['V_SET']' 
 			{
@@ -324,12 +353,6 @@ I		:  I '+' I
                 }
 		| IDENT
 		| VALUE;
-
-OBJECT		: '{' KV_SET '}' ;
-
-KV_SET		: KV KV_SET | KV | /*empty*/ ;
-
-KV		: IDENT ':' VALUE ';' ;
 
 VALUE		: INT | STR | ARRAY | OBJECT;
 

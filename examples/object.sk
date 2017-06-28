@@ -1,0 +1,6 @@
+
+var obj = { "cinco" : 5 ; }
+
+
+print(obj.contains("cinco"))
+
