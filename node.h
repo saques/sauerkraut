@@ -100,6 +100,17 @@ public:
 	virtual llvm::Value* codeGen(CodeGenContext& context);
 };
 
+class MethodInvocationNode : public ExpressionNode {
+public:
+	ExpressionNode& object;
+	const IdentifierNode& id;
+	ExpressionList arguments;
+	MethodInvocationNode(ExpressionNode& object,const IdentifierNode& id,
+	                     ExpressionList& arguments):
+	object(object), id(id), arguments(arguments) {}
+	virtual llvm::Value* codeGen(CodeGenContext& context);
+};
+
 class ArrayCreationNode : public ExpressionNode {
 public:
 	ExpressionList elements;

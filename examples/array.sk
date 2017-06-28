@@ -5,7 +5,7 @@ function sumarr(a) {
 
 var _7 = 2 + 5
 
-var arr = [ "hola" , _7 , [ "array" ] ]
+var arr = [ "primer elemento" , _7 , [ "array" ] ]
 
 print(arr)
 
@@ -14,6 +14,10 @@ arr = arr + ["otro array"]
 print(arr)
 
 arr = sumarr(arr)
+
+print(arr)
+
+arr = arr.get(0)
 
 print(arr)
 

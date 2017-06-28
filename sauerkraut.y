@@ -224,6 +224,15 @@ CALL		:  IDENT '(' PASSEDARGS ')'
 				ExpressionList *list = new ExpressionList();
 				$$ = new FunctionCallNode(*$1, *list);
 			}
+			| I'.'IDENT'('PASSEDARGS')'
+			{
+				$$ = new MethodInvocationNode(*$1,*$3,*$5);
+			}
+			| I'.'IDENT'('PASSEDARGS')'
+			{
+				ExpressionList *list = new ExpressionList();
+				$$ = new MethodInvocationNode(*$1,*$3,*list);
+			}
 			;
 
 PASSEDARGS	:   I ',' PASSEDARGS

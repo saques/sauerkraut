@@ -253,6 +253,21 @@ Value * createCharArray(CodeGenContext& context, std::string stri)
 	return ptr;
 }
 
+Value * MethodInvocationNode::codeGen(CodeGenContext& context){
+	Function * function = context.module->getFunction("funcexec");
+	if (function == NULL) {
+		std::cerr << "no such function (coreCoreFunctionFail) " << "funcexec"<< endl;
+	}
+	std::vector<Value*> args;
+	args.push_back(object.codeGen(context));
+	args.push_back(createCharArray(context,id.name));
+	args.push_back(expressionListPointerArray(context,arguments));
+	args.push_back(ConstantInt::get(Type::getInt64Ty(getGlobalContext()), arguments.size(), true));
+	CallInst *call = CallInst::Create(function, makeArrayRef(args), "", context.currentBlock());
+	return call;
+}
+
+
 Value * UnaryOperationNode::codeGen(CodeGenContext& context)
 {
 	Function * function = context.module->getFunction("funcexec");
