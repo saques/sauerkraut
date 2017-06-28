@@ -278,6 +278,10 @@ I		:  I '+' I
 		{
 			$$ = new BinaryOperationNode(*$1, *$3,"sum");
 		}
+		| '(' INSTR ')'
+		{
+			$$ =(ExpressionNode*)  new ExpressionStatementNode(*$2);
+		}		
 		| I '-' I
 		{
 	            $$ = new BinaryOperationNode(*$1, *$3,"subtract");
