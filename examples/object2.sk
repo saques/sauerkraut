@@ -1,0 +1,9 @@
+var obj = { "array"  : ["hola", 5, {}];
+	    "number" : 5;
+	    "object" : {"obj":5;} ;
+          }
+
+print(obj.remove("array"))
+print(obj.remove("number"))
+print(obj.remove("object"))
+print(obj.size())
