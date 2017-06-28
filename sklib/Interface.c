@@ -33,10 +33,10 @@ void *  printi(void * i) {
 }
 
 /* testing only */
-void * readi(void *i){
-	String *s=((String *)((Object *) i)->instance);
-	scanf("%s",s->s);
-	return INT0;
+void * readi(){
+	int i = 0;
+	scanf("%d",&i);
+	return newIntegerObj(i);
 }
 
 void * read(){

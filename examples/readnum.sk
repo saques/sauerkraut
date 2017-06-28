@@ -1,0 +1,6 @@
+var num = readi()
+
+num = num + 2
+
+print(num)
+

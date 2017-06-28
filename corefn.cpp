@@ -70,6 +70,6 @@ void createCoreFunctions(CodeGenContext& context){
 	appendCoreFunction(&context, "printi", 1);
 	appendFuncexec(&context, "funcexec");
 	appendCoreFunction(&context,"print",1);
-	appendCoreFunction(&context,"readi",1);
+	appendCoreFunction(&context,"readi",0);
 	appendCoreFunction(&context,"read",0);
 }
