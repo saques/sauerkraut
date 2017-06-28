@@ -34,7 +34,8 @@ static Class * arrClass = NULL;
 		 exit(1);
 	 }
 	 Array * a = (Array *)((Object *)this)->instance;
-	 Integer * index = (Integer *)((Object *)args[0])->instance;
+	 Integer * index = 
+	 (Integer*)_funcexec((Object *)args[0],"toInt",NULL,0)->instance;
 	 if(index->i<0 || index->i>=a->n){
 		 errorout("Array::get : index out of bounds");
 		 exit(1);
@@ -48,7 +49,8 @@ static Class * arrClass = NULL;
 		 exit(1);
 	 }
 	 Array * a = (Array *)((Object *)this)->instance;
-	 Integer * index = (Integer *)((Object *)args[0])->instance;
+	 Integer * index = 
+	 (Integer*)_funcexec((Object *)args[0],"toInt",NULL,0)->instance;
 	 Object * val = (Object *)args[1];
 	 if(index->i<0 || index->i>=a->n){
 		 errorout("Array::get : index out of bounds");
