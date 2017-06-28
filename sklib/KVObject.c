@@ -9,7 +9,7 @@
 #include "include/ErrorPrint.h"
 #include "include/KVObject.h"
 #include "include/linear_hash.h"
-
+#define BUFSIZE 32
 typedef struct Pair{
 	Object * key; /*String*/
 	Object * value; /*any*/
@@ -21,7 +21,7 @@ static Class * kvClass = NULL;
  * METHODS FOR KVObject
  */
 
-const static int NMETHODS = 5;
+const static int NMETHODS = 6;
 
 Object * contains(void * this, void ** args, int nArgs){
 	if(nArgs!=1){
@@ -107,6 +107,18 @@ Object * sizeObj(void * this, void ** args, int nArgs){
 	return newObject(newInteger(lh_nelems(kv->table)),integerClass());
 }
 
+Object * toStringObj(void * this, void ** args, int nArgs){
+	if(nArgs!=0){
+		errorout("Object::toString expects 0 arguments");
+		exit(1);
+	}
+	KVObject * kv = (KVObject *)((Object *)this)->instance;
+	int size = lh_nelems(kv->table);
+	char * buf = malloc(BUFSIZE);
+	sprintf(buf,"Object::size=%d",size);
+	return newObject(newString(buf),stringClass());
+}
+
 
 /*
  * END METHODS FOR KVObject
@@ -125,6 +137,7 @@ Class * KVObjectClass(){
 	kvClass->methods[2] = newObject(newMethod((function)getObj,"get"),methodClass());
 	kvClass->methods[3] = newObject(newMethod((function)removeObj,"remove"),methodClass());
 	kvClass->methods[4] = newObject(newMethod((function)sizeObj,"size"),methodClass());
+	kvClass->methods[5] = newObject(newMethod((function)toStringObj,"toString"),methodClass());
 
 	return kvClass;
 }
