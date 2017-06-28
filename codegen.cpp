@@ -5,6 +5,7 @@
 using namespace std;
 
 Value * createCharArray(CodeGenContext& context, std::string stri);
+Value* expressionListPointerArray(CodeGenContext& context, ExpressionList elements);
 
 /* Compile the AST into a module */
 bool CodeGenContext::generateCode(BlockNode& root, raw_ostream * out)
@@ -82,18 +83,10 @@ Value* StringNode::codeGen(CodeGenContext& context)
 	return call;
 }
 
-Value* ArrayCreationNode::codeGen(CodeGenContext& context)
-{
-	std::cerr << "Creating array" << endl;
-	Function *function = context.module->getFunction("newArrayObj");
-	if (function == NULL) {
-		std::cerr << "no such function (coreCoreFunctionFail) " << "newArrayObj"<< endl;
-	}
-	
-	std::vector<Value*> args;
+
+Value* expressionListPointerArray(CodeGenContext& context, ExpressionList elements){
 	ExpressionList::const_iterator it;
 	int i=0;
-	
 	Type * voidp = PointerType::get(IntegerType::get(getGlobalContext(), 8), 0);
 	ArrayType* arrayType = ArrayType::get(voidp, elements.size());
 
@@ -112,9 +105,20 @@ Value* ArrayCreationNode::codeGen(CodeGenContext& context)
 		);
 	}
 	auto index = ConstantInt::get(getGlobalContext(), llvm::APInt(32, 0, true));
-	auto ptr = GetElementPtrInst::Create(arrayType, arr_alloc, { zero, index }, "", context.currentBlock());
+	return GetElementPtrInst::Create(arrayType, arr_alloc, { zero, index }, "", context.currentBlock());
+}
+
+Value* ArrayCreationNode::codeGen(CodeGenContext& context)
+{
+	std::cerr << "Creating array" << endl;
+	Function *function = context.module->getFunction("newArrayObj");
+	if (function == NULL) {
+		std::cerr << "no such function (coreCoreFunctionFail) " << "newArrayObj"<< endl;
+	}
 	
-	args.push_back(ptr);
+	std::vector<Value*> args;
+	
+	args.push_back(expressionListPointerArray(context,elements));
 	
 	args.push_back(ConstantInt::get(Type::getInt64Ty(getGlobalContext()), elements.size(), true));
 	
