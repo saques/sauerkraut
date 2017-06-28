@@ -228,7 +228,7 @@ CALL		:  IDENT '(' PASSEDARGS ')'
 			{
 				$$ = new MethodInvocationNode(*$1,*$3,*$5);
 			}
-			| I'.'IDENT'('PASSEDARGS')'
+			| I'.'IDENT'(' ')'
 			{
 				ExpressionList *list = new ExpressionList();
 				$$ = new MethodInvocationNode(*$1,*$3,*list);
@@ -244,11 +244,7 @@ PASSEDARGS	:   I ',' PASSEDARGS
 		        {
 				$$ = new ExpressionList();
 				$$->push_front($1);
-			}
-			| /*empty*/
-			{
-				$$ = new ExpressionList();
-			}
+				}
 			;
 
 

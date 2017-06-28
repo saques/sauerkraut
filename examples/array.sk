@@ -17,6 +17,8 @@ arr = sumarr(arr)
 
 print(arr)
 
+print("size: " + arr.size())
+
 arr = arr.get(0)
 
 print(arr)

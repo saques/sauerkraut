@@ -4,3 +4,8 @@ num = num + 2
 
 print(num)
 
+var arr = [num,num+2]
+
+print(arr)
+
+print(arr.get(0))
