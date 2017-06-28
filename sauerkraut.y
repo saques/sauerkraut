@@ -281,7 +281,11 @@ I		:  I '+' I
 		| '(' INSTR ')'
 		{
 			$$ =(ExpressionNode*)  new ExpressionStatementNode(*$2);
-		}		
+		}
+		| CALL
+		{
+			$$ =(ExpressionNode*) new ExpressionStatementNode(*$1);
+		}
 		| I '-' I
 		{
 	            $$ = new BinaryOperationNode(*$1, *$3,"subtract");
