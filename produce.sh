@@ -1,4 +1,8 @@
 #!/bin/bash
+if [ $2 == 'r' ]
+then
+	make clean
+fi
 cd sklib
 make
 cd ..

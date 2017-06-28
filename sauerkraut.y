@@ -103,7 +103,7 @@ RET		: RETKW INSTR
 			$$ = new ReturnNode(*$2);
 		}
 
-EXPR	: INSTR
+EXPR	        : INSTR
 		{
 			$$ = new ExpressionStatementNode(*$1);
 		}
@@ -149,7 +149,18 @@ V_SET		: VALUE ',' V_SET
 			{
 				$$ = new ExpressionList();
 				$$->push_front($1);
-			};
+			}
+			| INSTR
+			{
+				$$ = new ExpressionList();
+				$$->push_front((ExpressionNode *)new ExpressionStatementNode(*$1));
+			}
+			| INSTR ',' V_SET
+			{
+				$$ = $3;
+                                $$->push_front((ExpressionNode *)new ExpressionStatementNode(*$1));
+			}
+			;
 
 
 
@@ -221,20 +232,20 @@ CALL		:  IDENT '(' PASSEDARGS ')'
 			{
 				$$ = new FunctionCallNode(*$1, *$3);
 			}
-		 	| IDENT '(' ')'
+			| IDENT '(' ')'
 			{
 				ExpressionList *list = new ExpressionList();
 				$$ = new FunctionCallNode(*$1, *list);
 			}
 			;
 
-PASSEDARGS	:  INSTR ',' PASSEDARGS
-			{
-				$$ = $3;
-				$$->push_front($1);
-			}
-			| INSTR
-			{
+PASSEDARGS	:       INSTR ',' PASSEDARGS
+		        {
+		                $$ = $3;
+			        $$->push_front($1);
+		        }
+		        | INSTR
+		        {
 				$$ = new ExpressionList();
 				$$->push_front($1);
 			}
@@ -269,52 +280,52 @@ I		:  I '+' I
 		}
 		| I '-' I
 		{
-            $$ = new BinaryOperationNode(*$1, *$3,"subtract");
-        }
-		 | I '*' I
-		 {
-            $$ = new BinaryOperationNode(*$1, *$3,"multiply");
-         }
-		 | I '/' I
-		 {
-            $$ = new BinaryOperationNode(*$1, *$3,"divide");
-         }
-		 | I '<' I
-		 {
-            $$ = LOWER(*$1,*$3);
-         }
-		 | I '>' I
-		 {
-            $$ = GREATER(*$1,*$3);
-         }
-		 | I LE I
-		 {
-            $$ = NOT(*(GREATER(*$1,*$3)));
-         }
-		 | I GE I
-		 {
-            $$ = NOT(*(LOWER(*$1,*$3)));
-         }
-		 | I EQ I
-		 {
-            $$ = EQUAL(*$1,*$3);
-         }
-		 | I NE I
-		 {
-            $$ = NOT(*(EQUAL(*$1,*$3)));
-         }
-		 | I OR I
-		 {
-            $$ = new BinaryOperationNode(*$1, *$3,"or");
-         }
-		 | I AND I
-		 {
-            $$ = new BinaryOperationNode(*$1, *$3,"and");
-         }
-		 | IDENT
-		 | INT
-		 | STR
-		 | ARRAY;
+	            $$ = new BinaryOperationNode(*$1, *$3,"subtract");
+                }
+		| I '*' I
+		{
+                    $$ = new BinaryOperationNode(*$1, *$3,"multiply");
+                }
+		| I '/' I
+		{
+                    $$ = new BinaryOperationNode(*$1, *$3,"divide");
+                }
+		| I '<' I
+		{
+                    $$ = LOWER(*$1,*$3);
+                }
+		| I '>' I
+		{
+                    $$ = GREATER(*$1,*$3);
+                }
+		| I LE I
+		{
+                    $$ = NOT(*(GREATER(*$1,*$3)));
+                }
+		| I GE I
+		{
+                    $$ = NOT(*(LOWER(*$1,*$3)));
+                }
+		| I EQ I
+		{
+                    $$ = EQUAL(*$1,*$3);
+                }
+		| I NE I
+		{
+                    $$ = NOT(*(EQUAL(*$1,*$3)));
+                }
+		| I OR I
+		{
+                    $$ = new BinaryOperationNode(*$1, *$3,"or");
+                }
+		| I AND I
+		{
+                    $$ = new BinaryOperationNode(*$1, *$3,"and");
+                }
+		| IDENT
+		| INT
+		| STR
+		| ARRAY;
 
 OBJECT		: '{' KV_SET '}' ;
 
