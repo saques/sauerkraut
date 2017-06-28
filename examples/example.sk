@@ -1,9 +1,8 @@
 
-function hello(a) {
-	var b = 10
-	var c = 11
+function mul2(a) {
+	return a*2
 }
 
 var a = 10
-var b = 200
-hello(b)
+
+hello(mul2(a))

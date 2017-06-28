@@ -1,4 +1,11 @@
-var arr = [ "hola" , 2 , [ "array" ] ]
+function sumarr(a) {
+	a = a + []
+	return a
+}
+
+var _7 = 2 + 5
+
+var arr = [ "hola" , _7 , [ "array" ] ]
 
 print(arr)
 
@@ -6,7 +13,10 @@ arr = arr + ["otro array"]
 
 print(arr)
 
-arr = 5 + arr
+arr = sumarr(arr)
 
 print(arr)
 
+arr = 5 + arr
+
+print(arr)

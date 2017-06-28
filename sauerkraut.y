@@ -98,15 +98,16 @@ ST		: EXPR ST
 		}
 		;
 
-RET		: RETKW INSTR
+RET		: RETKW I
 		{
 			$$ = new ReturnNode(*$2);
 		}
 
-EXPR	        : INSTR
+EXPR	: INSTR
 		{
 			$$ = new ExpressionStatementNode(*$1);
 		}
+		| WHILE
 		;
 
 VAR		:  VARKW IDENT
@@ -116,10 +117,6 @@ VAR		:  VARKW IDENT
 		| VARKW IDENT '=' I
 		{
 			$$ = new VariableDeclarationNode(*$2, $4);
-		}
-		| VARKW IDENT '=' INSTR
-		{
-			$$ = new VariableDeclarationNode(*$2,(ExpressionNode *)new ExpressionStatementNode(*$4));
 		}
 		;
 
@@ -140,25 +137,15 @@ ARRAY		: '['V_SET']'
 				$$ = new ArrayCreationNode(*el);
 			};		
 			
-V_SET		: VALUE ',' V_SET  
+V_SET		: I ',' V_SET  
 			{
 				$$ = $3;
 				$$->push_front($1);
 			}
-			| VALUE 
+			| I 
 			{
 				$$ = new ExpressionList();
 				$$->push_front($1);
-			}
-			| INSTR
-			{
-				$$ = new ExpressionList();
-				$$->push_front((ExpressionNode *)new ExpressionStatementNode(*$1));
-			}
-			| INSTR ',' V_SET
-			{
-				$$ = $3;
-                                $$->push_front((ExpressionNode *)new ExpressionStatementNode(*$1));
 			}
 			;
 
@@ -225,7 +212,7 @@ STR			: STRING
 
 BLOCK		: EXPR  BLOCK | /*empty*/ ;
 
-INSTR		: I | ASSIGN | CALL  | WHILE ;
+INSTR		: I | ASSIGN ;
 
 
 CALL		:  IDENT '(' PASSEDARGS ')'
@@ -239,12 +226,12 @@ CALL		:  IDENT '(' PASSEDARGS ')'
 			}
 			;
 
-PASSEDARGS	:       INSTR ',' PASSEDARGS
+PASSEDARGS	:   I ',' PASSEDARGS
 		        {
 		                $$ = $3;
 			        $$->push_front($1);
 		        }
-		        | INSTR
+		        | I
 		        {
 				$$ = new ExpressionList();
 				$$->push_front($1);
@@ -268,7 +255,7 @@ I2		:  I '<' I
 		 | I AND I
 		 ;
 
-ASSIGN		: IDENT '=' INSTR
+ASSIGN		: IDENT '=' I
 			{
 				$$ = new AssignmentNode(*$1, *$3);
 			};
@@ -278,7 +265,7 @@ I		:  I '+' I
 		{
 			$$ = new BinaryOperationNode(*$1, *$3,"sum");
 		}
-		| '(' INSTR ')'
+		| '(' I ')'
 		{
 			$$ =(ExpressionNode*)  new ExpressionStatementNode(*$2);
 		}
@@ -331,9 +318,7 @@ I		:  I '+' I
                     $$ = new BinaryOperationNode(*$1, *$3,"and");
                 }
 		| IDENT
-		| INT
-		| STR
-		| ARRAY;
+		| VALUE;
 
 OBJECT		: '{' KV_SET '}' ;
 

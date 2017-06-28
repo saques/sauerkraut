@@ -108,7 +108,7 @@ static Class * arrClass = NULL;
 	 /*
 	  * Efficiency FTW
 	  */
-	 a->objs = (Object **)realloc(a->objs,a->n+1);
+	 a->objs = (Object **)realloc(a->objs,(a->n+1)*sizeof(Object*));
 	 a->objs[a->n] = val;
 	 a->n++;
 	 return (Object *)this;
