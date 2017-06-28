@@ -19,9 +19,11 @@ print(arr)
 
 print("size: " + arr.size())
 
-arr = arr.get(0)
+print("first element: " +  arr.get(0))
 
-print(arr)
+arr.set(0,"nuevo primer elemento")
+
+print("changed first element: " + arr)
 
 arr = 5 + arr
 

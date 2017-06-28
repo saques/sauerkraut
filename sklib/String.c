@@ -45,7 +45,7 @@ Object * sumString(void * obj, void ** args, int nArgs){
 	Object * o = _funcexec((Object *)args[0],"toString",NULL,0);
 	String * other = (String *)(o->instance);
 
-	char * ans = malloc(strlen(this->s)+strlen(other->s)-1);
+	char * ans = malloc(strlen(this->s)+strlen(other->s)+1);
 
 	strcpy(ans,this->s);
 	strcat(ans,other->s);
