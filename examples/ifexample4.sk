@@ -1,0 +1,40 @@
+function f(a){
+	if(a){
+		print("OK")
+	} else {
+		print("WRONG")
+	}
+}
+
+
+var obj = {}
+
+f(obj)
+
+obj = {"hola" : 1;}
+
+f(obj)
+
+var c = "true"
+
+f(c)
+
+c = "TRUE"
+
+f(c)
+
+c = "FALSE"
+
+f(c)
+
+c= "false"
+
+f(c)
+
+c = "sdas"
+
+f(c)
+
+c = ""
+
+f(c)

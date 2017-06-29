@@ -1,0 +1,21 @@
+function a(b) {
+	if(b){
+		print("OK")
+	} else {
+		print("WRONG")
+	}
+}
+
+if("hola"){
+	print("OK")
+} else {
+	print("WRONG")
+}
+
+var c = 1
+
+if(c){
+	print("OK")
+} else {
+	print("WRONG")
+}

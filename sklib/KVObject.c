@@ -10,6 +10,7 @@
 #include "include/KVObject.h"
 #include "include/linear_hash.h"
 #define BUFSIZE 32
+
 typedef struct Pair{
 	Object * key; /*String*/
 	Object * value; /*any*/
@@ -21,7 +22,7 @@ static Class * kvClass = NULL;
  * METHODS FOR KVObject
  */
 
-const static int NMETHODS = 6;
+const static int NMETHODS = 7;
 
 Object * contains(void * this, void ** args, int nArgs){
 	if(nArgs!=1){
@@ -119,6 +120,15 @@ Object * toStringObj(void * this, void ** args, int nArgs){
 	return newObject(newString(buf),stringClass());
 }
 
+Object * toIntObj(void * this, void ** args, int nArgs){
+	if(nArgs!=0){
+		errorout("Object::toInt expects 0 arguments");
+		exit(1);
+	}
+	KVObject * kv = (KVObject *)((Object *)this)->instance;
+	return newObject(newInteger(lh_nelems(kv->table)),integerClass());
+}
+
 
 /*
  * END METHODS FOR KVObject
@@ -138,6 +148,7 @@ Class * KVObjectClass(){
 	kvClass->methods[3] = newObject(newMethod((function)removeObj,"remove"),methodClass());
 	kvClass->methods[4] = newObject(newMethod((function)sizeObj,"size"),methodClass());
 	kvClass->methods[5] = newObject(newMethod((function)toStringObj,"toString"),methodClass());
+	kvClass->methods[6] = newObject(newMethod((function)toIntObj,"toInt"),methodClass());
 
 	return kvClass;
 }

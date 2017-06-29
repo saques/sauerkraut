@@ -8,7 +8,7 @@
 #include "include/Method.h"
 #include "include/ErrorPrint.h"
 
-#define BUFSIZE 16
+#define BUFSIZE 32
 
 
 static Class * iClass = NULL;
@@ -25,7 +25,7 @@ Object * toStringInteger(void * obj, void ** args, int nArgs){
 	}
 	Integer * this = (Integer *)(((Object *)obj)->instance);
 	char * s = malloc(BUFSIZE);
-	snprintf(s,BUFSIZE,"%d",this->i);
+	snprintf(s,BUFSIZE,"%ld",this->i);
 	return newObject(newString(s),stringClass());
 }
 
@@ -102,7 +102,6 @@ Object * modulo(void * obj,void ** args, int nArgs){
 	return newObject(newInteger(this->i%other->i),integerClass());
 }
 
-//[other,this]
 Object * Intequal(void * obj,void ** args, int nArgs){
     if(nArgs!=1){
         errorout("Integer::equal expects 1 argument");
@@ -115,7 +114,7 @@ Object * Intequal(void * obj,void ** args, int nArgs){
 
     return newObject(newInteger(this->i==other->i),integerClass());
 }
-//[other,this]
+
 Object * Intlower(void * obj,void ** args, int nArgs){
     if(nArgs!=1){
         errorout("Integer::lower expects 1 argument");
@@ -128,7 +127,7 @@ Object * Intlower(void * obj,void ** args, int nArgs){
 
     return newObject(newInteger(this->i<other->i),integerClass());
 }
-//[other,this]
+
 Object * Intgreater(void * obj,void ** args, int nArgs){
     if(nArgs!=1){
         errorout("Integer::greater expects 1 argument");
@@ -142,7 +141,6 @@ Object * Intgreater(void * obj,void ** args, int nArgs){
     return newObject(newInteger(this->i>other->i),integerClass());
 }
 
-//[other,this]
 Object * or(void * obj,void ** args, int nArgs){
     if(nArgs!=1){
         errorout("Integer::or expects 1 argument");
@@ -156,7 +154,6 @@ Object * or(void * obj,void ** args, int nArgs){
     return newObject(newInteger(this->i||other->i),integerClass());
 }
 
-//[other,this]
 Object * and(void * obj,void ** args, int nArgs){
     if(nArgs!=1){
         errorout("Integer::and expects 1 argument");
@@ -170,7 +167,6 @@ Object * and(void * obj,void ** args, int nArgs){
     return newObject(newInteger(this->i&&other->i),integerClass());
 }
 
-//[other,this]
 Object * not(void * obj,void ** args, int nArgs){
     if(nArgs!=0){
         errorout("Integer::not expects 0 argument");
@@ -206,7 +202,7 @@ Class * integerClass(){
 	return iClass;
 }
 
-Integer * newInteger(int i){
+Integer * newInteger(int64_t i){
 	Integer * ans = (Integer *)malloc(sizeof(Integer));
 	ans->i=i;
 	return ans;

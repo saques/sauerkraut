@@ -6,4 +6,4 @@ function fibo(n) {
 	}
 }
 
-print(fibo(25))
+print(fibo(readi()))
