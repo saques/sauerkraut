@@ -287,7 +287,7 @@ PASSEDARGS	:   I ',' PASSEDARGS
 			;
 
 
-WHILE		: WHILEKW '(' INSTR ')' '{' BLOCK '}'
+WHILE		: WHILEKW '(' INSTR ')' '{' ST '}'
 			{
 				$$ = new WhileNode(*$3, *$6);
 			}
