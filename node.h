@@ -173,3 +173,12 @@ public:
 		:	expression(expression), thenBlock(thenBlock), elseBlock(elseBlock) {};
 	virtual llvm::Value* codeGen(CodeGenContext& context);
 };
+
+class WhileNode : public StatementNode {
+public:
+	ExpressionNode& expression;
+	BlockNode& thenBlock;
+	WhileNode(ExpressionNode& expression, BlockNode& thenBlock) :
+		expression(expression), thenBlock(thenBlock) {} ;
+	virtual llvm::Value * codeGen(CodeGenContext& context);
+};

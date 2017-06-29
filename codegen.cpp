@@ -451,8 +451,45 @@ Value * IfNode::codeGen(CodeGenContext& context)
 
 	context.pushBlock(MergeBB, oldLocals);
 	builder.SetInsertPoint(MergeBB);
-
-	Type * voidp = PointerType::get(IntegerType::get(getGlobalContext(), 8), 0);
-
 	return MergeBB;
+}
+
+Value * WhileNode::codeGen(CodeGenContext& context) {
+
+	std::cerr << "Generating while code " << endl;
+
+	std::map <std::string, Value *> oldLocals;
+	oldLocals.insert(context.locals().begin(), context.locals().end());
+
+	Function * function = context.currentBlock()->getParent();
+	BasicBlock * LoopCond =  BasicBlock::Create(getGlobalContext(), "condition", function, 0);
+	BasicBlock * BodyBlock = BasicBlock::Create(getGlobalContext(), "body", function, 0);
+	BasicBlock * AfterBlock = BasicBlock::Create(getGlobalContext(), "afterwhile", function, 0);
+	builder.CreateBr(LoopCond);
+	builder.SetInsertPoint(LoopCond);
+	context.pushBlock(LoopCond);
+	Value * condVal = eval(context, expression.codeGen(context));
+	if (condVal == NULL) {
+		return NULL;
+	}
+	condVal = builder.CreateICmpNE(
+		condVal,
+		ConstantInt::get(Type::getInt64Ty(getGlobalContext()), 0, true),
+		"ifcond"
+	);
+	builder.CreateCondBr(condVal, BodyBlock, AfterBlock);
+	context.popBlock();
+
+	context.pushBlock(BodyBlock);
+	builder.SetInsertPoint(BodyBlock);
+	Value * BodyV = thenBlock.codeGen(context);
+	bool bodyReturns = context.getCurrentReturnValue() != NULL ? true : false;
+	context.popBlock();
+	context.popBlock();
+	if(!bodyReturns) {
+		builder.CreateBr(LoopCond);
+	}
+	builder.SetInsertPoint(AfterBlock);
+	context.pushBlock(AfterBlock, oldLocals);
+	return AfterBlock;
 }

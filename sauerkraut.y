@@ -42,7 +42,7 @@ void yyerror(const char * s){
 }
 %token ID INTEGER STRING VARKW FUNKW END LE GE EQ NE OR AND WHILEKW EXTERNKW RETKW IFKW ELSEKW
 
-%type <st>	    FUNC VAR EXPR EXTERN_FUNC RET IF
+%type <st>	    FUNC VAR EXPR EXTERN_FUNC RET IF WHILE
 %type <ident> 	IDENT
 %type <block> 	ST BLOCK
 %type <arg_list> ARGS ARGSET
@@ -95,6 +95,11 @@ ST		: EXPR ST
 			$$ = $2;
 			$2->statements.push_front($<st>1);
 		}
+		|	WHILE ST
+		{
+			$$ = $2;
+			$2->statements.push_front($<st>1);
+		}
 		| RET
 		{
 			$$ = new BlockNode();
@@ -115,7 +120,6 @@ EXPR	: INSTR
 		{
 			$$ = new ExpressionStatementNode(*$1);
 		}
-		| WHILE
 		;
 
 VAR		:  VARKW IDENT
@@ -283,17 +287,11 @@ PASSEDARGS	:   I ',' PASSEDARGS
 			;
 
 
-WHILE		: WHILEKW '(' I2 ')' BLOCK END;
-
-I2		:  I '<' I
-		 | I '>' I
-		 | I LE I
-		 | I GE I
-		 | I EQ I
-		 | I NE I
-		 | I OR I
-		 | I AND I
-		 ;
+WHILE		: WHILEKW '(' INSTR ')' '{' BLOCK '}'
+			{
+				$$ = new WhileNode(*$3, *$6);
+			}
+			;
 
 IF	:	IFKW	'(' INSTR ')' '{' ST '}' 	ELSEKW '{' ST '}'
  	{
@@ -318,16 +316,16 @@ I		:  I '+' I
 		}
 		| '(' I ')'
 		{
-			$$ =(ExpressionNode*)  new ExpressionStatementNode(*$2);
+			$$ = $2;
 		}
 		| CALL
 		{
-			$$ =(ExpressionNode*) new ExpressionStatementNode(*$1);
+			$$ = $1;
 		}
 		| I '-' I
 		{
-	            $$ = new BinaryOperationNode(*$1, *$3,"subtract");
-                }
+			$$ = new BinaryOperationNode(*$1, *$3,"subtract");
+        }
 		| I '*' I
 		{
                     $$ = new BinaryOperationNode(*$1, *$3,"multiply");
