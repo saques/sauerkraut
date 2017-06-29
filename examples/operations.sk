@@ -1,6 +1,6 @@
 var a = 7
 var b = a + 3
-printi(b)
+printi(b+6)
 b=7-3
 printi(b)
 b=a*3
