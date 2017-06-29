@@ -83,6 +83,7 @@ Class * methodClass(){
 	}
 	mClass = (Class *)malloc(sizeof(Class));
 	
+	mClass->name = METHOD;
 	mClass->methods = (Object **)malloc(sizeof(Object *)*NMETHODS);
 	mClass->nMethods = NMETHODS;
 
