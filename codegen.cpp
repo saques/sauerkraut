@@ -377,9 +377,7 @@ Value * FunctionDeclarationNode::codeGen(CodeGenContext& context)
 
 	block.codeGen(context);
 	if (context.getCurrentReturnValue() == NULL) {
-		ReturnInst::Create(getGlobalContext(), IntegerNode(0).codeGen(context), context.currentBlock());
-	} else {
-		ReturnInst::Create(getGlobalContext(), context.getCurrentReturnValue(), context.currentBlock());
+		builder.CreateRet(IntegerNode(0).codeGen(context));
 	}
 
 	context.popBlock();
@@ -390,11 +388,9 @@ Value * FunctionDeclarationNode::codeGen(CodeGenContext& context)
 Value * ReturnNode::codeGen(CodeGenContext& context)
 {
 	Value *returnValue = expression.codeGen(context);
-	if (context.getCurrentReturnValue() != NULL) {
-		std::cerr << "Compilation error: multiple return statements" << endl;
-		return NULL;
-	} else {
+	if (returnValue != NULL){
 		context.setCurrentReturnValue(returnValue);
+		builder.CreateRet(returnValue);
 		return returnValue;
 	}
 }
@@ -437,15 +433,20 @@ Value * IfNode::codeGen(CodeGenContext& context)
 	builder.SetInsertPoint(ThenBB);
 	Value * ThenV = thenBlock.codeGen(context);
 	ThenBB = builder.GetInsertBlock();
+	bool thenReturns = context.getCurrentReturnValue() != NULL ? true : false;
 	context.popBlock();
-
-	builder.CreateBr(MergeBB);
+	if (!thenReturns) {
+		builder.CreateBr(MergeBB);
+	}
 	context.pushBlock(ElseBB);
 	builder.SetInsertPoint(ElseBB);
 	Value *ElseV = elseBlock.codeGen(context);
+	bool elseReturns = context.getCurrentReturnValue() != NULL ? true : false;
 	context.popBlock();
 	context.popBlock();
-	builder.CreateBr(MergeBB);
+	if (!elseReturns) {
+		builder.CreateBr(MergeBB);
+	}
 	ElseBB = builder.GetInsertBlock();
 
 	context.pushBlock(MergeBB, oldLocals);
@@ -453,12 +454,5 @@ Value * IfNode::codeGen(CodeGenContext& context)
 
 	Type * voidp = PointerType::get(IntegerType::get(getGlobalContext(), 8), 0);
 
-	PHINode *PN = builder.CreatePHI(
-		voidp, 2, "iftmp"
-	);
-	PN->addIncoming(ThenV, ThenBB);
-	if (ElseV != NULL) {
-		PN->addIncoming(ElseV, ElseBB);
-	}
-	return PN;
+	return MergeBB;
 }
