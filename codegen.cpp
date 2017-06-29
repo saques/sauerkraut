@@ -14,7 +14,7 @@ bool CodeGenContext::generateCode(BlockNode& root, raw_ostream * out)
 
 	/* Create the top level interpreter function to call as entry */
 	vector<Type*> argTypes;
-	FunctionType *ftype = FunctionType::get(Type::getVoidTy(getGlobalContext()), makeArrayRef(argTypes), false);
+	FunctionType *ftype = FunctionType::get(Type::getInt64Ty(getGlobalContext()), makeArrayRef(argTypes), false);
 	mainFunction = Function::Create(ftype, GlobalValue::ExternalLinkage, "main", module);
 	BasicBlock *bblock = BasicBlock::Create(getGlobalContext(), "entry", mainFunction, 0);
 	builder.SetInsertPoint(bblock);
@@ -22,7 +22,7 @@ bool CodeGenContext::generateCode(BlockNode& root, raw_ostream * out)
 	pushBlock(bblock);
 	 /* emit bytecode for the toplevel block */
 	if (root.codeGen(*this) != NULL) {
-		ReturnInst::Create(getGlobalContext(), currentBlock());
+		builder.CreateRet(ConstantInt::get(Type::getInt64Ty(getGlobalContext()), 0, true));
 		popBlock();
 		/* Print the bytecode in a human-readable format
 		   to see if our program compiled properly

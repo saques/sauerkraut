@@ -21,7 +21,7 @@ print("size: " + arr.size())
 
 print("first element: " +  arr.get(0))
 
-arr.set("",[])
+arr.set(1,[])
 
 print("changed first element: " + arr)
 

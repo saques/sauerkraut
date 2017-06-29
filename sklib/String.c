@@ -17,7 +17,7 @@ static Class * sClass = NULL;
 /*
  * METHODS FOR String
  */
-const static int NMETHODS = 6;
+const static int NMETHODS = 7;
 
 bool isnumber(const char * s) {
 		while (*s != 0 && *s == ' ') s++;
@@ -77,6 +77,18 @@ Object * toIntString(void * obj, void ** args, int nArgs){
 	}
 }
 
+Object * stringLength(void * obj, void ** args, int nArgs) {
+	if(nArgs!=0){
+		errorout("String::length expects 0 arguments");
+		exit(1);
+	}
+
+	String * this = (String *)((Object *)obj)->instance;
+	const char * s = this->s;
+	int64_t len = (int64_t) strlen(s);
+	return newObject(newInteger(len), integerClass());
+}
+
 Object * sumString(void * obj, void ** args, int nArgs){
 	if(nArgs!=1){
 		errorout("String::sum expects 1 arguments");
@@ -93,6 +105,24 @@ Object * sumString(void * obj, void ** args, int nArgs){
 	strcat(ans,other->s);
 
 	return newObject(newString(ans),stringClass());
+}
+
+Object * getString(void * obj, void ** args, int nArgs){
+	if(nArgs!=1){
+		errorout("String::get expects 1 argument");
+		exit(1);
+	}
+	String * str = (String *)((Object *)obj)->instance;
+	Integer * index = (Integer*)_funcexec((Object *)args[0],"toInt",NULL,0)->instance;
+
+	int len = strlen(str->s);
+	if(index->i<0 || index->i >= len){
+		errorout("String::get : index out of bounds");
+		exit(1);
+	}
+	char c = str->s[index->i];
+	char arr [] = {c, 0};
+	return newObject(newString( (char *) arr),stringClass());
 }
 
 Object * Strequal(void * obj, void ** args, int nArgs){
@@ -151,7 +181,8 @@ Class * stringClass(){
 	sClass->methods[3] = newObject(newMethod((function)Strlower,"lower"),methodClass());
 	sClass->methods[4] = newObject(newMethod((function)Strgreater,"greater"),methodClass());
 	sClass->methods[5] = newObject(newMethod((function)sumString,"sum"),methodClass());
-
+	sClass->methods[6] = newObject(newMethod((function)stringLength,"length"),methodClass());
+	sClass->methods[7] = newObject(newMethod((function)getString,"get"),methodClass());
 	return sClass;
 }
 
