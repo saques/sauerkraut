@@ -73,4 +73,7 @@ public:
     void setCurrentReturnValue(Value *value) { blocks.top()->returnValue = value; }
     Value* getCurrentReturnValue() { return blocks.top()->returnValue; }
 	CodeGenBlock * currentCodeGenBlock() {blocks.top();}
+	bool isMain(){
+		return mainFunction == currentBlock()->getParent();
+	}
 };

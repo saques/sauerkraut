@@ -6,6 +6,7 @@ using namespace std;
 IRBuilder<> builder(getGlobalContext());
 Value * createCharArray(CodeGenContext& context, std::string stri);
 Value* expressionListPointerArray(CodeGenContext& context, ExpressionList elements);
+Value * eval(CodeGenContext& context, Value * value);
 
 /* Compile the AST into a module */
 bool CodeGenContext::generateCode(BlockNode& root, raw_ostream * out)
@@ -23,6 +24,7 @@ bool CodeGenContext::generateCode(BlockNode& root, raw_ostream * out)
 	 /* emit bytecode for the toplevel block */
 	if (root.codeGen(*this) != NULL) {
 		builder.CreateRet(ConstantInt::get(Type::getInt64Ty(getGlobalContext()), 0, true));
+
 		popBlock();
 		/* Print the bytecode in a human-readable format
 		   to see if our program compiled properly
@@ -391,7 +393,12 @@ Value * ReturnNode::codeGen(CodeGenContext& context)
 	Value *returnValue = expression.codeGen(context);
 	if (returnValue != NULL){
 		context.setCurrentReturnValue(returnValue);
-		builder.CreateRet(returnValue);
+		/* if return statement is inside main, Integer conversion is necessary */
+		if (context.isMain())  {
+			builder.CreateRet(eval(context, returnValue));
+		} else {
+			builder.CreateRet(returnValue);
+		}
 		return returnValue;
 	}
 }
