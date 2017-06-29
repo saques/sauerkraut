@@ -1,0 +1,3 @@
+var integer = " 0.0     "
+var sum = integer.toInt() + 20
+print(sum)

@@ -17,7 +17,7 @@ static Class * sClass = NULL;
 /*
  * METHODS FOR String
  */
-const static int NMETHODS = 7;
+const static int NMETHODS = 9;
 
 bool isnumber(const char * s) {
 		while (*s != 0 && *s == ' ') s++;
@@ -125,6 +125,33 @@ Object * getString(void * obj, void ** args, int nArgs){
 	return newObject(newString( (char *) arr),stringClass());
 }
 
+Object * setString(void * obj, void ** args, int nArgs){
+	if(nArgs!=2){
+		errorout("String::set expects 2 arguments");
+		exit(1);
+	}
+	String * str = (String *)((Object *)obj)->instance;
+	Integer * index = (Integer*)_funcexec((Object *)args[0],"toInt",NULL,0)->instance;
+
+	int len = strlen(str->s);
+	if(index->i<0 || index->i >= len){
+		errorout("String::get : index out of bounds");
+		exit(1);
+	}
+
+	String * value = (String*)_funcexec((Object *)args[1],"toString",NULL,0)->instance;
+	if (strlen(value->s) != 1) {
+		errorout("String::set expects a single character string");
+		exit(1);
+	}
+	char * dup = strdup(str->s);
+	dup[index->i] = value->s[0];
+	free((void*) str->s);
+	str->s = dup;
+	return (Object *) obj;
+}
+
+
 Object * Strequal(void * obj, void ** args, int nArgs){
 	if(nArgs!=1){
 		errorout("String::equal expects 1 arguments");
@@ -169,6 +196,8 @@ Object * Strgreater(void * obj, void ** args, int nArgs){
  */
 
 
+
+
 Class * stringClass(){
 	if(sClass!=NULL){
 		return sClass;
@@ -183,6 +212,7 @@ Class * stringClass(){
 	sClass->methods[5] = newObject(newMethod((function)sumString,"sum"),methodClass());
 	sClass->methods[6] = newObject(newMethod((function)stringLength,"length"),methodClass());
 	sClass->methods[7] = newObject(newMethod((function)getString,"get"),methodClass());
+	sClass->methods[8] = newObject(newMethod((function)setString,"set"),methodClass());
 	return sClass;
 }
 

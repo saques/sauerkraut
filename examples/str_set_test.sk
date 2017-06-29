@@ -1,0 +1,4 @@
+var hola = "hola"
+
+hola.set(1, 3)
+print(hola)

@@ -1,0 +1,3 @@
+var hola = "hola"
+
+print(hola.get(3))
