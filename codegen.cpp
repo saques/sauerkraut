@@ -3,7 +3,8 @@
 #include "sauerkraut.hpp"
 #include <deque>
 using namespace std;
-IRBuilder<> builder(getGlobalContext());
+extern LLVMContext TheContext;
+IRBuilder<> builder(TheContext);
 Value * createCharArray(CodeGenContext& context, std::string stri);
 Value* expressionListPointerArray(CodeGenContext& context, ExpressionList elements);
 Value * eval(CodeGenContext& context, Value * value);
@@ -15,15 +16,15 @@ bool CodeGenContext::generateCode(BlockNode& root, raw_ostream * out)
 
 	/* Create the top level interpreter function to call as entry */
 	vector<Type*> argTypes;
-	FunctionType *ftype = FunctionType::get(Type::getInt64Ty(getGlobalContext()), makeArrayRef(argTypes), false);
+	FunctionType *ftype = FunctionType::get(Type::getInt64Ty(TheContext), makeArrayRef(argTypes), false);
 	mainFunction = Function::Create(ftype, GlobalValue::ExternalLinkage, "main", module);
-	BasicBlock *bblock = BasicBlock::Create(getGlobalContext(), "entry", mainFunction, 0);
+	BasicBlock *bblock = BasicBlock::Create(TheContext, "entry", mainFunction, 0);
 	builder.SetInsertPoint(bblock);
 	/* Push a new variable/block context */
 	pushBlock(bblock);
 	 /* emit bytecode for the toplevel block */
 	if (root.codeGen(*this) != NULL) {
-		builder.CreateRet(ConstantInt::get(Type::getInt64Ty(getGlobalContext()), 0, true));
+		builder.CreateRet(ConstantInt::get(Type::getInt64Ty(TheContext), 0, true));
 
 		popBlock();
 		/* Print the bytecode in a human-readable format
@@ -67,7 +68,7 @@ Value* IntegerNode::codeGen(CodeGenContext& context)
 		std::cerr << "no such function (coreCoreFunctionFail) " << "newIntegerObj"<< endl;
 	}
 	std::vector<Value*> args;
-	args.push_back(ConstantInt::get(Type::getInt64Ty(getGlobalContext()), value, true));
+	args.push_back(ConstantInt::get(Type::getInt64Ty(TheContext), value, true));
 	CallInst *call = CallInst::Create(function, makeArrayRef(args), "", context.currentBlock());
 	return call;
 }
@@ -89,15 +90,15 @@ Value* StringNode::codeGen(CodeGenContext& context)
 Value* expressionListPointerArray(CodeGenContext& context, ExpressionList elements){
 	ExpressionList::const_iterator it;
 	int i=0;
-	Type * voidp = PointerType::get(IntegerType::get(getGlobalContext(), 8), 0);
+	Type * voidp = PointerType::get(IntegerType::get(TheContext, 8), 0);
 	ArrayType* arrayType = ArrayType::get(voidp, elements.size());
 
 	Value* arr_alloc = new AllocaInst(
 		   arrayType, "arrargs", context.currentBlock()
 	);
-	auto zero = ConstantInt::get(getGlobalContext(), llvm::APInt(64, 0, true));
+	auto zero = ConstantInt::get(TheContext, llvm::APInt(64, 0, true));
 	for (it = elements.begin(); it != elements.end(); it++, i++) {
-		auto index = ConstantInt::get(getGlobalContext(), llvm::APInt(32, i, true));
+		auto index = ConstantInt::get(TheContext, llvm::APInt(32, i, true));
 		auto ptr = GetElementPtrInst::Create(arrayType, arr_alloc, { zero, index }, "", context.currentBlock());
 		auto store = new llvm::StoreInst(
 			(**it).codeGen(context),
@@ -106,7 +107,7 @@ Value* expressionListPointerArray(CodeGenContext& context, ExpressionList elemen
 			context.currentBlock()
 		);
 	}
-	auto index = ConstantInt::get(getGlobalContext(), llvm::APInt(32, 0, true));
+	auto index = ConstantInt::get(TheContext, llvm::APInt(32, 0, true));
 	return GetElementPtrInst::Create(arrayType, arr_alloc, { zero, index }, "", context.currentBlock());
 }
 
@@ -122,7 +123,7 @@ Value* ArrayCreationNode::codeGen(CodeGenContext& context)
 
 	args.push_back(expressionListPointerArray(context,elements));
 
-	args.push_back(ConstantInt::get(Type::getInt64Ty(getGlobalContext()), elements.size(), true));
+	args.push_back(ConstantInt::get(Type::getInt64Ty(TheContext), elements.size(), true));
 
 	CallInst *call = CallInst::Create(function, makeArrayRef(args), "", context.currentBlock());
 	return call;
@@ -142,7 +143,7 @@ Value* KVObjectCreationNode::codeGen(CodeGenContext& context)
 	args.push_back(expressionListPointerArray(context,keys));
 	args.push_back(expressionListPointerArray(context,values));
 
-	args.push_back(ConstantInt::get(Type::getInt64Ty(getGlobalContext()), keys.size(), true));
+	args.push_back(ConstantInt::get(Type::getInt64Ty(TheContext), keys.size(), true));
 
 	CallInst *call = CallInst::Create(function, makeArrayRef(args), "", context.currentBlock());
 	return call;
@@ -173,7 +174,7 @@ Value* VariableDeclarationNode::codeGen(CodeGenContext& context)
 {
 	std::cerr << "Creating variable declaration " << id.name << endl;
 	if (context.locals().find(id.name) == context.locals().end()) {
-		Type * type = PointerType::get(IntegerType::get(getGlobalContext(), 8), 0);
+		Type * type = PointerType::get(IntegerType::get(TheContext, 8), 0);
 		AllocaInst *alloc = new AllocaInst(type
 				, id.name.c_str(), context.currentBlock());
 		context.locals()[id.name] = alloc;
@@ -216,9 +217,9 @@ Value* ExternalFunctionDeclarationNode::codeGen(CodeGenContext& context)
     VariableList::const_iterator it;
     for (int i = 0; i < arguments; i++) {
         //argTypes.push_back(typeOf((**it).type));
-		argTypes.push_back(Type::getInt64Ty(getGlobalContext()));
+		argTypes.push_back(Type::getInt64Ty(TheContext));
     }
-    FunctionType *ftype = FunctionType::get(Type::getInt64Ty(getGlobalContext()), makeArrayRef(argTypes), false);
+    FunctionType *ftype = FunctionType::get(Type::getInt64Ty(TheContext), makeArrayRef(argTypes), false);
     Function *function = Function::Create(ftype, GlobalValue::ExternalLinkage, id.name, context.module);
     return function;
 }
@@ -243,35 +244,35 @@ Value * createCharArray(CodeGenContext& context, std::string stri)
 {
 	const char * str = stri.c_str();
 	int len = strlen(str);
-	Type * chart = Type::getInt8Ty(getGlobalContext());
+	Type * chart = Type::getInt8Ty(TheContext);
 	ArrayType* arrayType = ArrayType::get(chart,len + 1);
 
 	Value* arr_alloc = new AllocaInst(
 	    arrayType, "chararray", context.currentBlock()
 	);
 
-	auto zero = ConstantInt::get(getGlobalContext(), llvm::APInt(64, 0, true));
+	auto zero = ConstantInt::get(TheContext, llvm::APInt(64, 0, true));
 	for (int i = 0; i < len; i++ ) {
-		auto index = ConstantInt::get(getGlobalContext(), llvm::APInt(32, i, true));
-		Type * voidp = PointerType::get(IntegerType::get(getGlobalContext(), 8), 0);
+		auto index = ConstantInt::get(TheContext, llvm::APInt(32, i, true));
+		Type * voidp = PointerType::get(IntegerType::get(TheContext, 8), 0);
 		auto ptr = GetElementPtrInst::Create(arrayType, arr_alloc, { zero, index }, "", context.currentBlock());
 		auto store = new llvm::StoreInst(
-			ConstantInt::get(Type::getInt8Ty(getGlobalContext()), str[i], true),
+			ConstantInt::get(Type::getInt8Ty(TheContext), str[i], true),
 			ptr,
 			false,
 			context.currentBlock()
 		);
 	}
-	auto index = ConstantInt::get(getGlobalContext(), llvm::APInt(32, len, true));
-	Type * voidp = PointerType::get(IntegerType::get(getGlobalContext(), 8), 0);
+	auto index = ConstantInt::get(TheContext, llvm::APInt(32, len, true));
+	Type * voidp = PointerType::get(IntegerType::get(TheContext, 8), 0);
 	auto ptr = GetElementPtrInst::Create(arrayType, arr_alloc, { zero, index }, "", context.currentBlock());
 	auto store = new llvm::StoreInst(
-		ConstantInt::get(Type::getInt8Ty(getGlobalContext()), 0, true),
+		ConstantInt::get(Type::getInt8Ty(TheContext), 0, true),
 		ptr,
 		false,
 		context.currentBlock()
 	);
-	index = ConstantInt::get(getGlobalContext(), llvm::APInt(32, 0, true));
+	index = ConstantInt::get(TheContext, llvm::APInt(32, 0, true));
 	ptr = GetElementPtrInst::Create(arrayType, arr_alloc, { zero, index }, "", context.currentBlock());
 	return ptr;
 }
@@ -285,7 +286,7 @@ Value * MethodInvocationNode::codeGen(CodeGenContext& context){
 	args.push_back(object.codeGen(context));
 	args.push_back(createCharArray(context,id.name));
 	args.push_back(expressionListPointerArray(context,arguments));
-	args.push_back(ConstantInt::get(Type::getInt64Ty(getGlobalContext()), arguments.size(), true));
+	args.push_back(ConstantInt::get(Type::getInt64Ty(TheContext), arguments.size(), true));
 	CallInst *call = CallInst::Create(function, makeArrayRef(args), "", context.currentBlock());
 	return call;
 }
@@ -299,11 +300,11 @@ Value * UnaryOperationNode::codeGen(CodeGenContext& context)
 	}
 	std::vector<Value*> args;
 	args.push_back(lhs.codeGen(context));
-	auto zero = ConstantInt::get(getGlobalContext(), llvm::APInt(64, 0, true));
-	auto index = ConstantInt::get(getGlobalContext(), llvm::APInt(32, 0, true));
+	auto zero = ConstantInt::get(TheContext, llvm::APInt(64, 0, true));
+	auto index = ConstantInt::get(TheContext, llvm::APInt(32, 0, true));
 
 	args.push_back(createCharArray(context, methodName.c_str()));
-	Type * voidp = PointerType::get(IntegerType::get(getGlobalContext(), 8), 0);
+	Type * voidp = PointerType::get(IntegerType::get(TheContext, 8), 0);
 	ArrayType* arrayType = ArrayType::get(voidp, 2);
 
 	Value* arr_alloc = new AllocaInst(
@@ -312,9 +313,9 @@ Value * UnaryOperationNode::codeGen(CodeGenContext& context)
 
 	auto ptr = GetElementPtrInst::Create(arrayType, arr_alloc, { zero, index }, "", context.currentBlock());
 	args.push_back(ptr);
-	// args.push_back(ConstantDataArray::get(getGlobalContext(), makeArrayRef(funargs));
+	// args.push_back(ConstantDataArray::get(TheContext, makeArrayRef(funargs));
 	/* push arguments count (1) */
-	args.push_back(ConstantInt::get(Type::getInt64Ty(getGlobalContext()), 0, true));
+	args.push_back(ConstantInt::get(Type::getInt64Ty(TheContext), 0, true));
 	CallInst *call = CallInst::Create(function, makeArrayRef(args), "", context.currentBlock());
 	return call;
 }
@@ -327,14 +328,14 @@ Value * BinaryOperationNode::codeGen(CodeGenContext& context)
 	}
 	std::vector<Value*> args;
 	args.push_back(lhs.codeGen(context));
-	auto zero = ConstantInt::get(getGlobalContext(), llvm::APInt(64, 0, true));
-	auto index = ConstantInt::get(getGlobalContext(), llvm::APInt(32, 0, true));
+	auto zero = ConstantInt::get(TheContext, llvm::APInt(64, 0, true));
+	auto index = ConstantInt::get(TheContext, llvm::APInt(32, 0, true));
 	/* push function name (sum) */
 	args.push_back(createCharArray(context, methodName.c_str()));
 	// std::vector<Value *> funargs;
 	// funargs.push_back(rhs.codeGen(context));
 	/* push function arguments {rhs exprssion} */
-	Type * voidp = PointerType::get(IntegerType::get(getGlobalContext(), 8), 0);
+	Type * voidp = PointerType::get(IntegerType::get(TheContext, 8), 0);
 	ArrayType* arrayType = ArrayType::get(voidp, 2);
 
 	Value* arr_alloc = new AllocaInst(
@@ -345,9 +346,9 @@ Value * BinaryOperationNode::codeGen(CodeGenContext& context)
 	auto ptr = GetElementPtrInst::Create(arrayType, arr_alloc, { zero, index }, "", context.currentBlock());
 	auto store = new llvm::StoreInst(rhs.codeGen(context), ptr, false, context.currentBlock());
 	args.push_back(ptr);
-	// args.push_back(ConstantDataArray::get(getGlobalContext(), makeArrayRef(funargs));
+	// args.push_back(ConstantDataArray::get(TheContext, makeArrayRef(funargs));
 	/* push arguments count (1) */
-	args.push_back(ConstantInt::get(Type::getInt64Ty(getGlobalContext()), 1, true));
+	args.push_back(ConstantInt::get(Type::getInt64Ty(TheContext), 1, true));
 	CallInst *call = CallInst::Create(function, makeArrayRef(args), "", context.currentBlock());
 	return call;
 }
@@ -356,13 +357,13 @@ Value * FunctionDeclarationNode::codeGen(CodeGenContext& context)
 {
 	vector<Type*> argTypes;
 	VariableList::const_iterator it;
-	Type * voidp = PointerType::get(IntegerType::get(getGlobalContext(), 8), 0);
+	Type * voidp = PointerType::get(IntegerType::get(TheContext, 8), 0);
 	for (it = arguments->begin(); it != arguments->end(); it++) {
 		argTypes.push_back(voidp);
 	}
 	FunctionType *ftype = FunctionType::get(voidp, makeArrayRef(argTypes), false);
 	Function *function = Function::Create(ftype, GlobalValue::InternalLinkage, id.name, context.module);
-	BasicBlock *bblock = BasicBlock::Create(getGlobalContext(), "entry", function, 0);
+	BasicBlock *bblock = BasicBlock::Create(TheContext, "entry", function, 0);
 	builder.SetInsertPoint(bblock);
 	context.pushBlock(bblock);
 
@@ -423,9 +424,9 @@ Value * IfNode::codeGen(CodeGenContext& context)
 	std::map <std::string, Value *> oldLocals;
 	oldLocals.insert(context.locals().begin(), context.locals().end());
 	Function * function = context.currentBlock()->getParent();
-	BasicBlock *ThenBB =BasicBlock::Create(getGlobalContext(), "then", function, 0);
-	BasicBlock *ElseBB = BasicBlock::Create(getGlobalContext(), "else", function, 0);
-	BasicBlock *MergeBB = BasicBlock::Create(getGlobalContext(), "ifcont", function, 0);
+	BasicBlock *ThenBB =BasicBlock::Create(TheContext, "then", function, 0);
+	BasicBlock *ElseBB = BasicBlock::Create(TheContext, "else", function, 0);
+	BasicBlock *MergeBB = BasicBlock::Create(TheContext, "ifcont", function, 0);
 
 	Value * condVal = eval(context, expression.codeGen(context));
 	if (condVal == NULL) {
@@ -433,7 +434,7 @@ Value * IfNode::codeGen(CodeGenContext& context)
 	}
 	condVal = builder.CreateICmpNE(
 		condVal,
-		ConstantInt::get(Type::getInt64Ty(getGlobalContext()), 0, true),
+		ConstantInt::get(Type::getInt64Ty(TheContext), 0, true),
 		"ifcond"
 	);
 	builder.CreateCondBr(condVal, ThenBB, ElseBB);
@@ -470,9 +471,9 @@ Value * WhileNode::codeGen(CodeGenContext& context) {
 	oldLocals.insert(context.locals().begin(), context.locals().end());
 
 	Function * function = context.currentBlock()->getParent();
-	BasicBlock * LoopCond =  BasicBlock::Create(getGlobalContext(), "condition", function, 0);
-	BasicBlock * BodyBlock = BasicBlock::Create(getGlobalContext(), "body", function, 0);
-	BasicBlock * AfterBlock = BasicBlock::Create(getGlobalContext(), "afterwhile", function, 0);
+	BasicBlock * LoopCond =  BasicBlock::Create(TheContext, "condition", function, 0);
+	BasicBlock * BodyBlock = BasicBlock::Create(TheContext, "body", function, 0);
+	BasicBlock * AfterBlock = BasicBlock::Create(TheContext, "afterwhile", function, 0);
 	builder.CreateBr(LoopCond);
 	builder.SetInsertPoint(LoopCond);
 	context.pushBlock(LoopCond);
@@ -482,7 +483,7 @@ Value * WhileNode::codeGen(CodeGenContext& context) {
 	}
 	condVal = builder.CreateICmpNE(
 		condVal,
-		ConstantInt::get(Type::getInt64Ty(getGlobalContext()), 0, true),
+		ConstantInt::get(Type::getInt64Ty(TheContext), 0, true),
 		"ifcond"
 	);
 	builder.CreateCondBr(condVal, BodyBlock, AfterBlock);

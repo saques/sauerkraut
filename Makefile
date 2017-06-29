@@ -6,7 +6,7 @@ OBJS = sauerkraut.o  \
 		codegen.o \
 		corefn.o
 
-LLVMCONFIG = llvm-config-3.8
+LLVMCONFIG = llvm-config
 CPPFLAGS = `$(LLVMCONFIG) --cppflags` -std=c++11
 LDFLAGS = `$(LLVMCONFIG) --ldflags` -lpthread -ldl -lz -lncurses -rdynamic
 LIBS = `$(LLVMCONFIG) --libs`

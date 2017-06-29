@@ -9,6 +9,7 @@ using namespace std;
 
 extern int yyparse();
 extern BlockNode * programStart;
+LLVMContext TheContext;
 void createCoreFunctions(CodeGenContext& context);
 
 static cl::opt<std::string>
