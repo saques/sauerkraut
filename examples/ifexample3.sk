@@ -1,0 +1,7 @@
+if (1 < 2) {
+	print("mierda")
+}
+if (2 > 5) {
+	print("no se imprime")
+}
+

@@ -299,6 +299,11 @@ IF	:	IFKW	'(' INSTR ')' '{' ST '}' 	ELSEKW '{' ST '}'
  	{
 		$$ = new IfNode(*$3, *$6, *$10);
 	}
+	| IFKW '(' INSTR ')' '{' ST '}'
+	{
+		BlockNode * elseBlock = new BlockNode();
+		$$ = new IfNode(*$3, *$6, *elseBlock);
+	}
 	;
 
 ASSIGN		: IDENT '=' I

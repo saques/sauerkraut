@@ -447,7 +447,7 @@ Value * IfNode::codeGen(CodeGenContext& context)
 	context.popBlock();
 	builder.CreateBr(MergeBB);
 	ElseBB = builder.GetInsertBlock();
-	
+
 	context.pushBlock(MergeBB, oldLocals);
 	builder.SetInsertPoint(MergeBB);
 
@@ -457,6 +457,8 @@ Value * IfNode::codeGen(CodeGenContext& context)
 		voidp, 2, "iftmp"
 	);
 	PN->addIncoming(ThenV, ThenBB);
-	PN->addIncoming(ElseV, ElseBB);
+	if (ElseV != NULL) {
+		PN->addIncoming(ElseV, ElseBB);
+	}
 	return PN;
 }

@@ -56,7 +56,14 @@ public:
 		}
 	}
 	void pushBlock(BasicBlock *block, std::map<std::string, Value*> locals) {
+		CodeGenBlock * oldTop = NULL;
+		if (!blocks.empty()) {
+			oldTop = blocks.top();
+		}
 		CodeGenBlock * newBlock = new CodeGenBlock();
+		if (oldTop != NULL) {
+			blocks.top()->locals.insert(oldTop->locals.begin(), oldTop->locals.end());
+		}
 		newBlock->locals.insert(locals.begin(), locals.end());
 		newBlock->block = block;
 		newBlock->returnValue = NULL;
