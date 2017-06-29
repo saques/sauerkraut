@@ -9,7 +9,6 @@ function fancyWhiles(a) {
 		i = i + 1
 		print("fin1")
 	}
-	print(j)
 	print("fin2")
 }
 
