@@ -53,7 +53,7 @@ Object * toIntString(void * obj, void ** args, int nArgs){
 	String * this = (String *)((Object *)obj)->instance;
 	const char * s = this->s;
 
-	int len = strlen(s);
+	int len = this->len;
 	char * tmp = (char*)malloc(len+1);
 	strcpy(tmp,s);
 	for(int i=0; i<len; i++){
@@ -85,7 +85,7 @@ Object * stringLength(void * obj, void ** args, int nArgs) {
 
 	String * this = (String *)((Object *)obj)->instance;
 	const char * s = this->s;
-	int64_t len = (int64_t) strlen(s);
+	int64_t len = (int64_t) this->len;
 	return newObject(newInteger(len), integerClass());
 }
 
@@ -99,7 +99,7 @@ Object * sumString(void * obj, void ** args, int nArgs){
 	Object * o = _funcexec((Object *)args[0],"toString",NULL,0);
 	String * other = (String *)(o->instance);
 
-	char * ans = malloc(strlen(this->s)+strlen(other->s)+1);
+	char * ans = malloc(this->len+other->len+1);
 
 	strcpy(ans,this->s);
 	strcat(ans,other->s);
@@ -115,7 +115,7 @@ Object * getString(void * obj, void ** args, int nArgs){
 	String * str = (String *)((Object *)obj)->instance;
 	Integer * index = (Integer*)_funcexec((Object *)args[0],"toInt",NULL,0)->instance;
 
-	int len = strlen(str->s);
+	int len = str->len;
 	if(index->i<0 || index->i >= len){
 		errorout("String::get : index out of bounds");
 		exit(1);
@@ -133,14 +133,14 @@ Object * setString(void * obj, void ** args, int nArgs){
 	String * str = (String *)((Object *)obj)->instance;
 	Integer * index = (Integer*)_funcexec((Object *)args[0],"toInt",NULL,0)->instance;
 
-	int len = strlen(str->s);
+	int len = str->len;
 	if(index->i<0 || index->i >= len){
 		errorout("String::get : index out of bounds");
 		exit(1);
 	}
 
 	String * value = (String*)_funcexec((Object *)args[1],"toString",NULL,0)->instance;
-	if (strlen(value->s) != 1) {
+	if (value->len != 1) {
 		errorout("String::set expects a single character string");
 		exit(1);
 	}
@@ -220,5 +220,6 @@ String * newString(const char * s){
 	String * ans = (String *)malloc(sizeof(String));
 	char * c_string = strdup(s);
 	ans->s=c_string;
+	ans->len = strlen(c_string);
 	return ans;
 }

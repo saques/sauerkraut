@@ -5,6 +5,7 @@
 
 typedef struct String {
 	const char * s;
+	int len;
 } String;
 
 Class * stringClass();
