@@ -1,7 +1,11 @@
 
+<p align="center">
+  <img src="sklogo.png" alt="logo"/>
+</p>
+
 # Requisitos: 
-	* llvm  -> sudo apt install llvm  
-	* clang -> sudo apt install clang 
+	* llvm  -> sudo apt install llvm  (3.8)
+	* clang -> sudo apt install clang (3.8)
 	* bison -> sudo apt-get install bison
 	* and stuff -> sudo apt-get install lib32ncurses5-dev zlib1g-dev 
 # Uso:
