@@ -381,6 +381,7 @@ Value * FunctionDeclarationNode::codeGen(CodeGenContext& context)
 	}
 
 	context.popBlock();
+	builder.SetInsertPoint(context.currentBlock());
 	std::cerr << "Creating function: " << id.name << endl;
 	return function;
 }
