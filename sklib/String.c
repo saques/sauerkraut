@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdbool.h>
 #include <ctype.h>
 
 
@@ -17,6 +18,24 @@ static Class * sClass = NULL;
  * METHODS FOR String
  */
 const static int NMETHODS = 6;
+
+bool isnumber(const char * s) {
+		while (*s != 0 && *s == ' ') s++;
+		if (*s == 0 || ((*s<'0' || *s>'9') && *s!='.') ) {
+			return false;
+		}
+		while (*s != 0 && *s >= '0' && *s<= '9') s++;
+		if (*s != 0 && *s != '.') {
+			return false;
+		}
+		*s++;
+		while (*s != 0 && *s >= '0' && *s<= '9') s++;
+		while (*s != 0 && *s == ' ') s++;
+		if (*s == 0) {
+			return true;
+		}
+		return false;
+}
 
 Object * toStringString(void * obj, void ** args, int nArgs){
 	if(nArgs!=0){
@@ -33,24 +52,29 @@ Object * toIntString(void * obj, void ** args, int nArgs){
 	}
 	String * this = (String *)((Object *)obj)->instance;
 	const char * s = this->s;
-	
+
 	int len = strlen(s);
 	char * tmp = (char*)malloc(len+1);
 	strcpy(tmp,s);
 	for(int i=0; i<len; i++){
 		tmp[i]=(char)tolower((char)tmp[i]);
 	}
-	
+
 	if(strcmp("true",tmp)==0){
 		free((void*)tmp);
 		return newObject(newInteger(1),integerClass());
-	}
-	if(strcmp("false",tmp)==0){
+	} else if(strcmp("false",tmp)==0){
 		free((void*)tmp);
 		return newObject(newInteger(0),integerClass());
+	} else {
+		free((void*)tmp);
+		int64_t stringInt = (int64_t) atof(s);
+		if (stringInt == 0 && !isnumber(s)) {
+			errorout("String::toInt could not convert to Integer");
+			exit(1);
+		}
+		return newObject(newInteger(stringInt), integerClass());
 	}
-	free((void*)tmp);
-	return newObject(newInteger((int64_t)len),integerClass());
 }
 
 Object * sumString(void * obj, void ** args, int nArgs){
