@@ -416,6 +416,8 @@ Value * IfNode::codeGen(CodeGenContext& context)
 {
 	std::cerr << "Generating if code " << endl;
 
+	std::map <std::string, Value *> oldLocals;
+	oldLocals.insert(context.locals().begin(), context.locals().end());
 	Function * function = context.currentBlock()->getParent();
 	BasicBlock *ThenBB =BasicBlock::Create(getGlobalContext(), "then", function, 0);
 	BasicBlock *ElseBB = BasicBlock::Create(getGlobalContext(), "else", function, 0);
@@ -442,11 +444,11 @@ Value * IfNode::codeGen(CodeGenContext& context)
 	builder.SetInsertPoint(ElseBB);
 	Value *ElseV = elseBlock.codeGen(context);
 	context.popBlock();
-
+	context.popBlock();
 	builder.CreateBr(MergeBB);
-
 	ElseBB = builder.GetInsertBlock();
-	context.pushBlock(MergeBB);
+	
+	context.pushBlock(MergeBB, oldLocals);
 	builder.SetInsertPoint(MergeBB);
 
 	Type * voidp = PointerType::get(IntegerType::get(getGlobalContext(), 8), 0);

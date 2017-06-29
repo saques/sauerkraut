@@ -26,6 +26,8 @@ public:
     BasicBlock *block;
     Value *returnValue;
     std::map<std::string, Value*> locals;
+
+
 };
 
 class CodeGenContext {
@@ -36,13 +38,32 @@ public:
 	Function *mainFunction;
     Module *module;
     CodeGenContext() { module = new Module("main", getGlobalContext()); }
-
     bool generateCode(BlockNode& root, raw_ostream * out);
     GenericValue runCode();
     std::map<std::string, Value*>& locals() { return blocks.top()->locals; }
     BasicBlock *currentBlock() { return blocks.top()->block; }
-    void pushBlock(BasicBlock *block) { blocks.push(new CodeGenBlock()); blocks.top()->returnValue = NULL; blocks.top()->block = block; }
+
+    void pushBlock(BasicBlock *block) {
+		CodeGenBlock * oldTop = NULL;
+		if (!blocks.empty()) {
+			oldTop = blocks.top();
+		}
+		blocks.push(new CodeGenBlock());
+		blocks.top()->returnValue = NULL;
+		blocks.top()->block = block;
+		if (oldTop != NULL) {
+			blocks.top()->locals.insert(oldTop->locals.begin(), oldTop->locals.end());
+		}
+	}
+	void pushBlock(BasicBlock *block, std::map<std::string, Value*> locals) {
+		CodeGenBlock * newBlock = new CodeGenBlock();
+		newBlock->locals.insert(locals.begin(), locals.end());
+		newBlock->block = block;
+		newBlock->returnValue = NULL;
+		blocks.push(newBlock);
+	}
     void popBlock() { CodeGenBlock *top = blocks.top(); blocks.pop(); delete top; }
     void setCurrentReturnValue(Value *value) { blocks.top()->returnValue = value; }
     Value* getCurrentReturnValue() { return blocks.top()->returnValue; }
+	CodeGenBlock * currentCodeGenBlock() {blocks.top();}
 };

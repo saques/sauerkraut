@@ -1,0 +1,13 @@
+function helloWorld() {
+	var hello = "hola"
+	var chau = "chau"
+	var finally = "final"
+	if (1 > 2) {
+		print(hello)
+	} else {
+		print(chau)
+	}
+	print(finally)
+}
+
+helloWorld()

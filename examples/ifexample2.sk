@@ -1,0 +1,14 @@
+var hello = "mierda"
+if (1 > 2) {
+	print("a")
+} else {
+	var a = 2
+	var b = 2
+	if (a == b) {
+		print(a + " == " + b)
+	} else {
+		print(a + " != " + b)
+	}
+	print(hello)
+}
+print(hello)
