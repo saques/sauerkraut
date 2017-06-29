@@ -1,0 +1,19 @@
+var obj = {
+		"1": [];
+		"2" : { "an obj" : 5 ;};
+		"3" : "hola";
+		"4" : 5;
+	  }
+			
+var iter = 0
+
+var key = 1
+
+while(iter < obj.size()){
+	var val = obj.get(key)
+	print(val.class() + " " + val)
+	key = key + 1
+	iter = iter + 1
+}
+
+print(iter)

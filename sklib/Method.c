@@ -81,7 +81,10 @@ Class * methodClass(){
 	if(mClass!=NULL){
 		return mClass;
 	}
-	mClass = newClass(METHOD,NMETHODS);
+	mClass = (Class *)malloc(sizeof(Class));
+	
+	mClass->methods = (Object **)malloc(sizeof(Object *)*NMETHODS);
+	mClass->nMethods = NMETHODS;
 
 	mClass->methods[0] = newObject(newMethod((function)execute,"execute"),mClass);
 
