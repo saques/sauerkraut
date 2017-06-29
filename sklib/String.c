@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <ctype.h>
 
 
 static Class * sClass = NULL;
@@ -31,8 +32,25 @@ Object * toIntString(void * obj, void ** args, int nArgs){
 		exit(1);
 	}
 	String * this = (String *)((Object *)obj)->instance;
-	int i = strlen(this->s);
-	return newObject(newInteger(i),integerClass());
+	const char * s = this->s;
+	
+	int len = strlen(s);
+	char * tmp = (char*)malloc(len+1);
+	strcpy(tmp,s);
+	for(int i=0; i<len; i++){
+		tmp[i]=(char)tolower((char)tmp[i]);
+	}
+	
+	if(strcmp("true",tmp)==0){
+		free((void*)tmp);
+		return newObject(newInteger(1),integerClass());
+	}
+	if(strcmp("false",tmp)==0){
+		free((void*)tmp);
+		return newObject(newInteger(0),integerClass());
+	}
+	free((void*)tmp);
+	return newObject(newInteger(len),integerClass());
 }
 
 Object * sumString(void * obj, void ** args, int nArgs){

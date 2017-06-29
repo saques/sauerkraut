@@ -47,9 +47,10 @@ void * read(){
 
 int eval(void * obj)
 {
-	Object * o = (Object *) obj;
-	Integer * i = (Integer *)o->instance;
-	return i-> i;
+	Object * o = (Object *)obj;
+	Object * o_int = (Object *)_funcexec(o,"toInt",NULL,0);
+	Integer * i = (Integer *)o_int->instance;
+	return i->i;
 }
 
 void * funcexec(void * o, char * name, void ** args, int nArgs){
