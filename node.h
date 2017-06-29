@@ -163,3 +163,13 @@ public:
 	ReturnNode(ExpressionNode& expression) : expression(expression) {}
 	virtual llvm::Value* codeGen(CodeGenContext& context);
 };
+
+class IfNode : public StatementNode {
+public:
+	ExpressionNode& expression;
+	BlockNode& thenBlock;
+	BlockNode& elseBlock;
+	IfNode(ExpressionNode& expression, BlockNode& thenBlock, BlockNode& elseBlock)
+		:	expression(expression), thenBlock(thenBlock), elseBlock(elseBlock) {};
+	virtual llvm::Value* codeGen(CodeGenContext& context);
+};

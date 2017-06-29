@@ -45,7 +45,11 @@ void * read(){
 	return (void *)newObject(newString(rec),stringClass());
 }
 
-
+int eval(void * obj)
+{
+	Object * o = (Object *)o;
+	return 1;
+}
 
 void * funcexec(void * o, char * name, void ** args, int nArgs){
 	return _funcexec(o, name, args, nArgs);

@@ -40,9 +40,9 @@ void yyerror(const char * s){
 	int i;
 	char * s;
 }
-%token ID INTEGER STRING VARKW FUNKW END LE GE EQ NE OR AND WHILEKW EXTERNKW RETKW
+%token ID INTEGER STRING VARKW FUNKW END LE GE EQ NE OR AND WHILEKW EXTERNKW RETKW IFKW ELSEKW
 
-%type <st>	    FUNC VAR EXPR EXTERN_FUNC RET
+%type <st>	    FUNC VAR EXPR EXTERN_FUNC RET IF
 %type <ident> 	IDENT
 %type <block> 	ST BLOCK
 %type <arg_list> ARGS ARGSET
@@ -89,6 +89,12 @@ ST		: EXPR ST
 			$$ = $2;
 			$2->statements.push_front($<st>1);
 		}
+		| IF ST
+		{
+
+			$$ = $2;
+			$2->statements.push_front($<st>1);
+		}
 		| RET
 		{
 			$$ = new BlockNode();
@@ -127,9 +133,9 @@ FUNC	: FUNKW IDENT ARGS '{' ST '}'
 			$$ = new FunctionDeclarationNode(*$2, $3, *$5);
 		}
 		;
-		
-		
-OBJECT		: '{' KV_SET '}' 
+
+
+OBJECT		: '{' KV_SET '}'
 			 {
 				$$ = $2;
 			 }
@@ -146,7 +152,7 @@ KV_SET		:  STR ':' I ';' KV_SET
 				$$->keys.push_front($1);
 				$$->values.push_front($3);
 			 }
-             | STR ':' I ';'  
+             | STR ':' I ';'
              {
 				ExpressionList * keys = new ExpressionList();
 				ExpressionList * values = new ExpressionList();
@@ -154,9 +160,9 @@ KV_SET		:  STR ':' I ';' KV_SET
 				values->push_front($3);
 				$$ = new KVObjectCreationNode(*keys,*values);
              };
-			
-		
-ARRAY		: '['V_SET']' 
+
+
+ARRAY		: '['V_SET']'
 			{
 				$$ = new ArrayCreationNode(*$2);
 			}
@@ -164,14 +170,14 @@ ARRAY		: '['V_SET']'
 			{
 				ExpressionList * el = new ExpressionList();
 				$$ = new ArrayCreationNode(*el);
-			};		
-			
-V_SET		: I ',' V_SET  
+			};
+
+V_SET		: I ',' V_SET
 			{
 				$$ = $3;
 				$$->push_front($1);
 			}
-			| I 
+			| I
 			{
 				$$ = new ExpressionList();
 				$$->push_front($1);
@@ -288,6 +294,12 @@ I2		:  I '<' I
 		 | I OR I
 		 | I AND I
 		 ;
+
+IF	:	IFKW	'(' INSTR ')' '{' ST '}' 	ELSEKW '{' ST '}'
+ 	{
+		$$ = new IfNode(*$3, *$6, *$10);
+	}
+	;
 
 ASSIGN		: IDENT '=' I
 			{

@@ -3,7 +3,7 @@
 #include "sauerkraut.hpp"
 #include <deque>
 using namespace std;
-
+IRBuilder<> builder(getGlobalContext());
 Value * createCharArray(CodeGenContext& context, std::string stri);
 Value* expressionListPointerArray(CodeGenContext& context, ExpressionList elements);
 
@@ -17,12 +17,12 @@ bool CodeGenContext::generateCode(BlockNode& root, raw_ostream * out)
 	FunctionType *ftype = FunctionType::get(Type::getVoidTy(getGlobalContext()), makeArrayRef(argTypes), false);
 	mainFunction = Function::Create(ftype, GlobalValue::ExternalLinkage, "main", module);
 	BasicBlock *bblock = BasicBlock::Create(getGlobalContext(), "entry", mainFunction, 0);
-
+	builder.SetInsertPoint(bblock);
 	/* Push a new variable/block context */
 	pushBlock(bblock);
 	 /* emit bytecode for the toplevel block */
 	if (root.codeGen(*this) != NULL) {
-		ReturnInst::Create(getGlobalContext(), bblock);
+		ReturnInst::Create(getGlobalContext(), currentBlock());
 		popBlock();
 		/* Print the bytecode in a human-readable format
 		   to see if our program compiled properly
@@ -115,13 +115,13 @@ Value* ArrayCreationNode::codeGen(CodeGenContext& context)
 	if (function == NULL) {
 		std::cerr << "no such function (coreCoreFunctionFail) " << "newArrayObj"<< endl;
 	}
-	
+
 	std::vector<Value*> args;
-	
+
 	args.push_back(expressionListPointerArray(context,elements));
-	
+
 	args.push_back(ConstantInt::get(Type::getInt64Ty(getGlobalContext()), elements.size(), true));
-	
+
 	CallInst *call = CallInst::Create(function, makeArrayRef(args), "", context.currentBlock());
 	return call;
 }
@@ -134,14 +134,14 @@ Value* KVObjectCreationNode::codeGen(CodeGenContext& context)
 	if (function == NULL) {
 		std::cerr << "no such function (coreCoreFunctionFail) " << "newKVObjectObj"<< endl;
 	}
-	
+
 	std::vector<Value*> args;
-	
+
 	args.push_back(expressionListPointerArray(context,keys));
 	args.push_back(expressionListPointerArray(context,values));
-	
+
 	args.push_back(ConstantInt::get(Type::getInt64Ty(getGlobalContext()), keys.size(), true));
-	
+
 	CallInst *call = CallInst::Create(function, makeArrayRef(args), "", context.currentBlock());
 	return call;
 }
@@ -361,7 +361,7 @@ Value * FunctionDeclarationNode::codeGen(CodeGenContext& context)
 	FunctionType *ftype = FunctionType::get(voidp, makeArrayRef(argTypes), false);
 	Function *function = Function::Create(ftype, GlobalValue::InternalLinkage, id.name, context.module);
 	BasicBlock *bblock = BasicBlock::Create(getGlobalContext(), "entry", function, 0);
-
+	builder.SetInsertPoint(bblock);
 	context.pushBlock(bblock);
 
 	Function::arg_iterator argsValues = function->arg_begin();
@@ -377,9 +377,9 @@ Value * FunctionDeclarationNode::codeGen(CodeGenContext& context)
 
 	block.codeGen(context);
 	if (context.getCurrentReturnValue() == NULL) {
-		ReturnInst::Create(getGlobalContext(), IntegerNode(0).codeGen(context), bblock);
+		ReturnInst::Create(getGlobalContext(), IntegerNode(0).codeGen(context), context.currentBlock());
 	} else {
-		ReturnInst::Create(getGlobalContext(), context.getCurrentReturnValue(), bblock);
+		ReturnInst::Create(getGlobalContext(), context.getCurrentReturnValue(), context.currentBlock());
 	}
 
 	context.popBlock();
@@ -390,7 +390,6 @@ Value * FunctionDeclarationNode::codeGen(CodeGenContext& context)
 Value * ReturnNode::codeGen(CodeGenContext& context)
 {
 	Value *returnValue = expression.codeGen(context);
-	printf("generating return\n ");
 	if (context.getCurrentReturnValue() != NULL) {
 		std::cerr << "Compilation error: multiple return statements" << endl;
 		return NULL;
@@ -398,4 +397,64 @@ Value * ReturnNode::codeGen(CodeGenContext& context)
 		context.setCurrentReturnValue(returnValue);
 		return returnValue;
 	}
+}
+
+Value * eval(CodeGenContext& context, Value * value)
+{
+	Function * function = context.module->getFunction("eval");
+	if (function == NULL) {
+		std::cerr << "no such function (coreCoreFunctionFail) " << "eval"<< endl;
+	}
+	std::vector<Value*> args;
+	args.push_back(value);
+	CallInst *call = CallInst::Create(function, makeArrayRef(args), "", context.currentBlock());
+	return call;
+}
+
+
+Value * IfNode::codeGen(CodeGenContext& context)
+{
+	std::cerr << "Generating if code " << endl;
+
+	Function * function = context.currentBlock()->getParent();
+	BasicBlock *ThenBB =BasicBlock::Create(getGlobalContext(), "then", function, 0);
+	BasicBlock *ElseBB = BasicBlock::Create(getGlobalContext(), "else", function, 0);
+	BasicBlock *MergeBB = BasicBlock::Create(getGlobalContext(), "ifcont", function, 0);
+
+	Value * condVal = eval(context, expression.codeGen(context));
+	if (condVal == NULL) {
+		return NULL;
+	}
+	condVal = builder.CreateICmpNE(
+		condVal,
+		ConstantInt::get(Type::getInt64Ty(getGlobalContext()), 0, true),
+		"ifcond"
+	);
+	builder.CreateCondBr(condVal, ThenBB, ElseBB);
+	context.pushBlock(ThenBB);
+	builder.SetInsertPoint(ThenBB);
+	Value * ThenV = thenBlock.codeGen(context);
+	ThenBB = builder.GetInsertBlock();
+	context.popBlock();
+
+	builder.CreateBr(MergeBB);
+	context.pushBlock(ElseBB);
+	builder.SetInsertPoint(ElseBB);
+	Value *ElseV = elseBlock.codeGen(context);
+	context.popBlock();
+
+	builder.CreateBr(MergeBB);
+
+	ElseBB = builder.GetInsertBlock();
+	context.pushBlock(MergeBB);
+	builder.SetInsertPoint(MergeBB);
+
+	Type * voidp = PointerType::get(IntegerType::get(getGlobalContext(), 8), 0);
+
+	PHINode *PN = builder.CreatePHI(
+		voidp, 2, "iftmp"
+	);
+	PN->addIncoming(ThenV, ThenBB);
+	PN->addIncoming(ElseV, ElseBB);
+	return PN;
 }
