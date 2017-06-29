@@ -10,6 +10,7 @@
 #include "include/KVObject.h"
 #include "include/linear_hash.h"
 #define BUFSIZE 32
+
 typedef struct Pair{
 	Object * key; /*String*/
 	Object * value; /*any*/

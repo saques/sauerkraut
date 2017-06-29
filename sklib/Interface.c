@@ -9,7 +9,7 @@
 #define INT0 (void *)newObject(newInteger(0),integerClass())
 #define BUFSIZE 32
 
-void * newIntegerObj(int i){
+void * newIntegerObj(int64_t i){
 	return (void *)newObject(newInteger(i),integerClass());
 }
 
@@ -25,17 +25,17 @@ void * newArrayObj(void ** vals, int n){
 	return (void *)newObject(newArray(vals,n),arrayClass());
 }
 
-/* debug only -> remember to do proper print */
-void *  printi(void * i) {
-	int a = ((Integer *)((Object *) i)->instance)->i;
-	printf("%d\n", a);
-	return 0;
+void *  printi(void * obj) {
+	Object * o_int = (Object *)_funcexec((Object *)obj,"toInt",NULL,0);
+	Integer * i = (Integer *)o_int->instance;
+	int64_t a = i->i;
+	printf("%ld\n", a);
+	return INT0;
 }
 
-/* testing only */
 void * readi(){
-	int i = 0;
-	scanf("%d",&i);
+	int64_t i = 0;
+	scanf("%ld",&i);
 	return newIntegerObj(i);
 }
 
@@ -50,7 +50,7 @@ int eval(void * obj)
 	Object * o = (Object *)obj;
 	Object * o_int = (Object *)_funcexec(o,"toInt",NULL,0);
 	Integer * i = (Integer *)o_int->instance;
-	return i->i;
+	return i->i == 0 ? 0 : 1;
 }
 
 void * funcexec(void * o, char * name, void ** args, int nArgs){

@@ -50,7 +50,7 @@ Object * toIntString(void * obj, void ** args, int nArgs){
 		return newObject(newInteger(0),integerClass());
 	}
 	free((void*)tmp);
-	return newObject(newInteger(len),integerClass());
+	return newObject(newInteger((int64_t)len),integerClass());
 }
 
 Object * sumString(void * obj, void ** args, int nArgs){

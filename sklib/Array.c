@@ -8,8 +8,6 @@
 #include <stdio.h>
 #include <string.h>
 
-#define BUFSIZE 32
-
 static Class * arrClass = NULL;
 
 
@@ -25,7 +23,7 @@ static Class * arrClass = NULL;
 		 exit(1);
 	 }
 	 Array * a = (Array *)((Object *)this)->instance;
-	 return newObject(newInteger(a->n),integerClass());
+	 return newObject(newInteger((int64_t)a->n),integerClass());
  }
  
  Object * getArr(void * this, void ** args, int nArgs){
