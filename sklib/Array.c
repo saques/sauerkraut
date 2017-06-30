@@ -139,10 +139,8 @@ Class * arrayClass(){
 
 Array * newArray(void ** objs, int n){
 	Array * ans = (Array *)malloc(sizeof(Array));
-	ans->objs = (Object **)malloc(1000*sizeof(Object *));
+	ans->objs = (Object **)malloc(n*sizeof(Object *));
 	for(int i=0; i<n; i++){
-		Object * a = (Object *) malloc(sizeof(Object));
-		memcpy(a, objs[i], sizeof(Object));
 		ans->objs[i] = (Object *)objs[i];
 	}
 	ans->n = n;
