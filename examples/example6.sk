@@ -1,6 +1,6 @@
 var s = "hola"
 
-var n = 5+s
+var n = 5.toString() +s
 
 print(n)
 
