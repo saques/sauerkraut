@@ -56,6 +56,7 @@ void yyerror(const char * s){
 
 
 %right "="
+%nonassoc RECURSIVE_ARRAY_ASSIGNMENT
 
 %left OR
 %left AND
@@ -313,7 +314,9 @@ IF	:	IFKW	'(' INSTR ')' '{' ST '}' ELSEKW '{' ST '}'
 ASSIGN		: IDENT '=' I
 			{
 				$$ = new AssignmentNode(*$1, *$3);
-			};
+			}
+
+			;
 
 
 I		: I '+' I
@@ -388,6 +391,10 @@ I		: I '+' I
 		| I '[' I ']'
 		{
 			$$ = new BinaryOperationNode(*$1, *$3, "get");
+		}
+		| I '[' I ']' '=' I		%prec RECURSIVE_ARRAY_ASSIGNMENT
+		{
+			$$ = new TertiaryOperationNode(*$1, *$3, *$6, "set" );
 		}
 		| IDENT
 		{

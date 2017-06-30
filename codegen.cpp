@@ -323,8 +323,7 @@ Value * BinaryOperationNode::codeGen(CodeGenContext& context)
 	auto index = ConstantInt::get(TheContext, llvm::APInt(32, 0, true));
 	/* push function name (sum) */
 	args.push_back(createCharArray(context, methodName.c_str()));
-	// std::vector<Value *> funargs;
-	// funargs.push_back(rhs.codeGen(context));
+
 	/* push function arguments {rhs exprssion} */
 	Type * voidp = PointerType::get(IntegerType::get(TheContext, 8), 0);
 	ArrayType* arrayType = ArrayType::get(voidp, 2);
@@ -336,9 +335,46 @@ Value * BinaryOperationNode::codeGen(CodeGenContext& context)
 	auto ptr = GetElementPtrInst::Create(arrayType, arr_alloc, { zero, index }, "", context.currentBlock());
 	auto store = new llvm::StoreInst(rhs.codeGen(context), ptr, false, context.currentBlock());
 	args.push_back(ptr);
-	// args.push_back(ConstantDataArray::get(TheContext, makeArrayRef(funargs));
+
 	/* push arguments count (1) */
 	args.push_back(ConstantInt::get(Type::getInt64Ty(TheContext), 1, true));
+	CallInst *call = CallInst::Create(function, makeArrayRef(args), "", context.currentBlock());
+	return call;
+}
+
+Value * TertiaryOperationNode::codeGen(CodeGenContext& context)
+{
+	Function * function = context.module->getFunction("funcexec");
+	if (function == NULL) {
+		std::cerr << "No such function (coreCoreFunctionFail) " << "funcexec"<< endl;
+		COMPILATIONFAIL = true;
+		return NULL;
+	}
+	std::vector<Value*> args;
+	args.push_back(lhs.codeGen(context));
+	auto zero = ConstantInt::get(TheContext, llvm::APInt(64, 0, true));
+	auto index = ConstantInt::get(TheContext, llvm::APInt(32, 0, true));
+	/* push function name (sum) */
+	args.push_back(createCharArray(context, methodName.c_str()));
+
+	/* push function arguments {rhs exprssion} */
+	Type * voidp = PointerType::get(IntegerType::get(TheContext, 8), 0);
+	ArrayType* arrayType = ArrayType::get(voidp, 2);
+
+	Value* arr_alloc = new AllocaInst(
+	    arrayType, "tertop", context.currentBlock()
+	);
+
+	auto ptr = GetElementPtrInst::Create(arrayType, arr_alloc, { zero, index }, "", context.currentBlock());
+	auto store = new llvm::StoreInst(mhs.codeGen(context), ptr, false, context.currentBlock());
+	args.push_back(ptr);
+
+	index = ConstantInt::get(TheContext, llvm::APInt(32, 1, true));
+	ptr = GetElementPtrInst::Create(arrayType, arr_alloc, { zero, index }, "", context.currentBlock());
+	store = new llvm::StoreInst(rhs.codeGen(context), ptr, false, context.currentBlock());
+	
+	/* push arguments count (1) */
+	args.push_back(ConstantInt::get(Type::getInt64Ty(TheContext), 2, true));
 	CallInst *call = CallInst::Create(function, makeArrayRef(args), "", context.currentBlock());
 	return call;
 }

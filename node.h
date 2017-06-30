@@ -148,6 +148,17 @@ public:
 	virtual llvm::Value * codeGen(CodeGenContext& context);
 };
 
+class TertiaryOperationNode : public ExpressionNode {
+public:
+	ExpressionNode& lhs;
+	ExpressionNode& mhs;
+	ExpressionNode& rhs;
+	std::string methodName;
+	TertiaryOperationNode(ExpressionNode& lhs, ExpressionNode& mhs, ExpressionNode& rhs,std::string methodName) :
+		lhs(lhs), mhs(mhs), rhs(rhs), methodName(methodName) {}
+	virtual llvm::Value * codeGen(CodeGenContext& context);
+};
+
 class UnaryOperationNode : public ExpressionNode {
 public:
     ExpressionNode& lhs;
