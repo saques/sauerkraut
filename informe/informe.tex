@@ -1,0 +1,175 @@
+\documentclass[12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage{geometry}
+\geometry{a4paper,margin=1.3in}
+\usepackage{amsmath}
+\usepackage{listings}
+\usepackage{graphicx}
+
+\begin{document}
+	\title{\textbf{Trabajo Práctico Especial}\\ Autómatas, Teoría de Lenguajes y Compiladores \\ \textbf{Sauerkraut}}
+	\author{Grupo \textbf{CHUCRUT} \\ CARACCIOLO, Juan Franco \\ OTA, Matías \\ RAIES, Tomás \\ SAQUÉS, M. Alejo}
+	\date{}
+	\maketitle
+	
+	\begin{abstract}
+		\verb|Sauerkraut| es un lenguaje de programación débilmente y dinámicamente tipado, \textit{subyacentemente orientado a objetos}, que soporta un conjunto de tipos \textit{built-in} inspirado en las estructuras usadas con mayor habitualidad: \verb|Integer|, \verb|String|, \verb|Array| y \verb|Object| $($este último sintácticamente similar a los objetos de \verb|JavaScript|$)$.
+		
+		El compilador se ha realizado en \verb|C++|, utilizando el entorno \verb|llvm| para la generación de código intermedio, y las herramientas \verb|lex| e \verb|yacc| para el \textit{tokenizado} y \textit{parsing} de la gramática respectivamente. \verb|clang|, el \textit{frontend} de \verb|llvm|, es utilizado para la generación de código ejecutable.
+	\end{abstract}
+	
+	\begin{figure}[h]
+		\centering
+		\includegraphics[width=7cm]{sklogo.png}
+	\end{figure}
+	
+	
+	\newpage
+	
+	\tableofcontents
+	
+	\newpage
+
+
+	\section{Idea subyacente y descripción funcional}
+	
+	\paragraph{} Como se ha detallado en el resumen, el objetivo del lenguaje diseñado fue el proveer un entorno de programación con herramientas \textit{built-in} sumamente útiles a la hora de programar. Además de los tipos de datos especificados como mínimos por la Cátedra, \verb|Integer| y \verb|String|, \verb|Array| y \verb|Object| constituyen dos herramientas útiles de la \textit{librería estándar} del lenguaje. Nótese que el último tipo mencionado, \verb|Object|, se comporta internamente como una \textit{hash table}, la cuál utiliza una librería públicamente disponible implementada con un algoritmo de \textit{linear hashing} \cite{linear_hash}.  
+	
+	\paragraph{} La intención fue desarrollar un lenguaje orientado a \textit{scripting}, por lo que las instrucciones se ejecutan en el orden de aparición en el archivo fuente. Es decir, no existe una función \verb|main()| declarada explícitamente por el usuario que sea el punto de entrada al programa. 
+	
+	\paragraph{} Por otro lado, en el resumen se ha mencionado que el lenguaje es \textit{subyacentemente orientado a objetos}. Esto quiere decir que, si bien actualmente el lenguaje no soporta la definición de nuevas clases, el diseño interno de la librería de \verb|Sauerkraut| está basado sobre una lógica de envío de métodos a objetos. A continuación se exhibirán algunas de las estructuras de la librería hecha en \verb|C| sobre las cuales se construyó dicha lógica:
+
+	\begin{center}
+		\begin{lstlisting}[language=C]
+		typedef struct Object {
+			void * instance;
+			Class * class;
+		} Object ;
+		\end{lstlisting}
+	\end{center}
+	
+	\paragraph{} A toda variable definida por el programador se le asigna un puntero a \verb|Object| que, como podrá verse, contiene a su vez una referencia a \verb|Class|:
+	
+	\begin{center}
+		\begin{lstlisting}[language=C]
+		typedef struct Class {
+			const char * name;
+			Object ** methods;
+			int nMethods;
+		} Class;
+		\end{lstlisting}
+	\end{center}
+	
+	\paragraph{} De esta forma, al acceder a la referencia de la clase del objeto en cuestión, se accede a su vez a los métodos a los que la misma responde. Así pues, el programador podría realizar lo siguiente:
+	
+	\begin{center}
+		\begin{lstlisting}
+		var obj = {"array":[5];}
+		
+		print(obj.contains("array"))
+		\end{lstlisting}
+	\end{center}
+	
+	\paragraph{} Código cuya salida sería \verb|1|. Internamente, la librería del lenguaje buscará linealmente en la lista de métodos para la clase \verb|Object| $($apuntada por el objeto que contiene la variable \verb|obj|$)$ un método cuyo nombre sea \verb|contains|. En el caso de que el método invocado no exista para un tipo dado, se producirá una terminación anormal del programa, exhibiendo un mensaje de error adecuado al usuario, especificando qúe método de qué clase se quiso invocar pero no fue encontrado. Nótese que \verb|struct Object| y la clase \verb|Object| son entidades diferentes: la primera es una estructura interna de la librería del lenguaje, y la segunda es un tipo expuesto al programador.
+	
+	
+	\paragraph{} Se puede observar que el arreglo de métodos está definido como un arreglo de \verb|Object|: esto se relaciona con uno de los planteos originales del lenguaje, que consistía en que las funciones definidas por el programador también se comportaran como objetos, lo cual hubiera permitido su almacenamiento en variables. Dado que la \textit{infraestructura} de la librería lo permite, sería cuestión de futuras extensiones el modificar el compilador para que las nuevas funciones definidas se comporten como tal.
+	
+	\section{Consideraciones adicionales}
+	
+	\paragraph{} Además de la implementación de los tipos adicionales \verb|Array| y \verb|Object|, la implementación del compilador se destaca por el uso del entorno \verb|llvm| $($\textit{low level virtual machine}$)$, el cual proveyó de herramientas sumamente útiles a la hora de generar código. La consideración con respecto a este punto está vinculada a la necesidad de escribir el compilador en \verb|C++| en vez de en \verb|C|, tal como se ha requerido en el punto 3 del enunciado del trabajo.
+	
+	\paragraph{} A medida que se va realizando el \textit{parsing} con \verb|yacc|, se van agregando nodos a un \verb|Árbol de Sintaxis Abstracta (AST)|, que luego se recorrerá para generar código con ayuda de \verb|llvm|. Este código se genera en LLVM IR, que se vuelca como salida a un archivo \verb|.ll| en formato texto plano. Posteriormente, aprovechando la funcionalidad del compilador \verb|clang| para compilar tanto codgo en \verb|C| como código \verb|LLVM IR|, se \textit{linkedita} el \verb|.ll| con las librerías estáticas del lenguaje.
+	
+	\paragraph{} Cabe aclarar que, por la naturaleza dinámica de los tipos en \verb|Sauerkraut|, hubiera sido complejo realizar operaciones directamente en código \verb|LLVM IR|, tal es así que la totalidad del código que involucre interactuar con los objetos se resuelve mediante llamadas a la librería estándar \verb|sklib|, no directamente en el archivo .ll. 
+	
+	\paragraph{} Esta librería provee una serie de funciones que actúan de interfaz entre el código compilado en \verb|llvm| y el \textit{back end} de \verb|Sauerkraut|:
+	
+	\begin{center}
+		\begin{tabular}{ l }			
+			\verb|void *newIntegerObj(int i)| \\
+			\verb|void *newStringObj(char * s)| \\
+			\verb|void *newArrayObj(void ** e, int n)| \\
+			\verb|void *newKVObjectObj(void ** keys,void ** vals, int n)| \\
+			\verb|void *funcexec(void * obj, char * name, void ** args, int nArgs)| \\
+		\end{tabular}
+	\end{center}
+	
+	\paragraph{} Todas las funciones de la interfaz retornan un puntero \verb|struct Object|, pero frente a \verb|llvm| y \verb|clang| lo único relevante es que devuelven \verb|i8*|.
+	
+	\paragraph{} Como nota adicional, las versiones de \verb|llvm| y \verb|clang| utilizadas son la 4.0, pero es posible que el compilador pueda ser compilado en otras versiones.
+	
+	\section{Descripción del desarrollo del trabajo}
+	
+	\paragraph{} En una instancia inicial, fue central el hecho de definir una gramática sobre la cuál se desarrollaría el lenguaje. Esto no solo incluyó el definir la sintaxis del mismo, sino el establecer las estructuras que el lenguaje soportaría por defecto.
+	
+	\paragraph{} Una vez definido esto, se procedió a transcribir la gramática a un formato estándar $($BNF$)$, y a diseñar la lógica interna de objetos y métodos. Esto llevó a la realización de una librería cuya compilación es independiente de la compilación del compilador en sí, siendo las funciones de la interfaz especificada más arriba el nexo entre los dos entornos. El \textit{desligamiento} entre los dos entornos permitió una mejor división de tareas y una dinámica de trabajo por lo general ágil.
+	
+	\paragraph{} Por el lado de \verb|llvm|, lo importante es notar que, al definir una nueva estructura, el proceso para que el compilador genere su código es relativamente simple: se debe$($n$)$ especificar el$($los$)$ nodo$($s$)$ para la traducción, añadir los atributos en el código en \verb|llvm|, especificar la función de la interfaz utilizada para generar el puntero a la estructura en el archivo \verb|corefn.cpp| y definir el$($los$)$ método$($s$)$ \verb|codeGen| correspondiente$($s$)$ en \verb|codegen.cpp|. Si todo se ha hecho correctamente, la estructura definida ya debería ser funcional. 
+	
+	\paragraph{} Parte de la gracia de utilizar \verb|llvm| radica en que no se tuvo que implementar tablas de simbolos propias, sino que se aprovecharon las funcionalidades que ofrece dicho entorno para tal fin.\verb|Sauerkraut| cuenta con \textit{scoping} en bloques para las variables tanto dentro de funciones como dentro de bloques \verb|if| y \verb|while|. Por otro lado, como limitación del lenguaje se puede mencionar que las declaración de funciones tiene alcance global.
+	
+	\paragraph{} Típicamente, al incluir una nueva estructura o funcionalidad, lo habitual fue escribir un fragmento de código en \verb|Sauerkraut| que buscara evaluar su correcto funcionamiento. Esto podría eventualmente dar lugar a una serie de escenarios: que la aplicación no compile, que su ejecución finalice correctamente $($\verb|exit(0)|$)$, o bien que su terminación sea anormal $($\verb|exit(1)|$)$, en el caso de que, por ejemplo, se busque ejecutar intencionalmente un método no existente para un tipo dado. Para corroborar rápidamente que todos los \textit{tests} cuyo valor de retorno debe ser $($\verb|exit(0)|$)$ ejecuten correctamente, se ha incluído un simple \textit{script} de prueba que verifica esta condición, e informa los casos en los que, eventualmente, haya un fallo.
+	
+	\section{Descripción de la gramática}
+	
+	\paragraph{} La gramática toma muchos elementos de la de \verb|JavaScript|, sobre todo considerando la sintáxis de los objetos, en cuyo caso no existen diferencias con respecto al lenguaje mencionado. Sin embargo, a diferencia de \verb|JavaScript|, no es posible definir una variable sin la palabra reservada \verb|var| antepuesta al identificador, algo que en dicho lenguaje es posible.
+	
+	\paragraph{} De manera opcional, a modo de separación entre instrucciones, es posible colocar el tradicional \verb|;| entre las mismas. La definición de funciones es idéntica a la de \verb|JavaScript|, anteponiendo la palabra reservada \verb|function| al identificador de la función, luego del mismo colocando la lista de variables que admite separados por \verb|,|.
+	
+	\paragraph{} Tal como pudo observarse en el ejemplo expuesto más arriba, la invocación de métodos se realiza de la manera tradicional.
+	
+	\paragraph{} En el repositorio entregado se encontrará la gramática escrita en un formato BNF.
+	
+	\section{Dificultades encontradas}
+	
+	\paragraph{} A pesar de las bondades de \verb|llvm|, es de notar que, al menos durante el tiempo en el que se desarrolló el trabajo, muchos de los archivos de la documentación arrojaban un error \verb|404 Not Found| al intentar acceder a los mismos, dificultando el entendimiento de su documentación. A los efectos de aprender su uso, hubo en gran medida que depender de fuentes y ejemplos en foros. Sin embargo, se pudo constatar que la versión más nueva de dicho entorno, la 5.0, posee una documentación mucho más rigurosa e incluso más didáctica. 
+	
+	\paragraph{} Con respecto a la versión utilizada de \verb|llvm|, durante gran parte del desarrollo el equipo se basó en la 3.8. Advirtiéndo que en Pampero la versión presente es la 4.0, se procedió a intentar compilar el proyecto en dicha versión, constatándose en el acto que la nueva versión no era, en efecto,  retrocompatible. Exactamente dos cambios hubo que realizar: se cambió de la manera de acceder al \textit{contexto}, que anteriormente se realizaba con el método \verb|getGlobalContext()|, además del método que realizaba la generación de código intermedio.
+	
+	\section{Futuras extensiones}
+	
+	\subsection{Garbage collection}
+	
+	\paragraph{} Muchos de los lenguajes que sirvieron de inspiración para \verb|Sauerkraut| implementan algún tipo de \textit{garbage collection}. En el estado actual del lenguaje, no sólo las variables fuera de \textit{scope} no se liberan, sino que es posible que haya \textit{memory leaks} fruto de la constante instanciación de nuevos objetos en el \verb|return| de los métodos implementados.
+	
+	\paragraph{} Una de las opciones sería el utilizar librerías conocidas de \textit{garbage collection} en \verb|C|, tales como la de \verb|Boehm-Demers-Weiser|.
+	
+	\subsection{Funciones como objetos}
+	
+	\paragraph{} Tal como se ha mencionado más arriba, una de las intenciones originales fue que este ítem fuese una característica del lenguaje. Este ítem presenta una serie de dificultades: 
+	
+	\paragraph{} Por un lado, es necesario conocer a partir de qué dirección de memoria se encuentra compilada la función a los efectos de poder invocarla programáticamente. Por otro lado, se deben tener precauciones a la hora del pasaje de argumentos y de la verificación de que su orden y cantidad sea la correcta. En el código realizado, esto se ha planteado especificando una \textit{signature} única para todas las funciones: 
+	\verb|typedef Object * (*function)(void *,void**,int);|, siendo el primer argumento el objeto que responde a la invocación $($en este caso sería el objeto \verb|Method| en sí$)$, y los siguientes dos los argumentos y su cantidad respectivamente.
+	
+	\subsection{Clases}
+	
+	\paragraph{} Sería interesante el poder ofrecer la posibilidad de definir nuevas clases. Las dificultades asociadas a este ítem están vinculadas a las del ítem anterior: una clase seguramente responderá a una serie de métodos, los cuales deberán ser compilados de manera tal que puedan ser encontrados de la misma forma que lo son los métodos de los tipos \textit{built-in}.
+	
+	\subsection{Otros tipos \textit{built-in}}
+	
+	\paragraph{} Dada la infraestructura provista por \verb|llvm|, crear nuevos tipos con su sintáxis propia no sería un problema mayor. La librería estándar podría ofrecer, por ejemplo, un tipo \verb|Deque| que haga las veces de \textit{stack} y de \textit{queue}.
+	
+	\begin{thebibliography}{9}
+		
+		\bibitem{linear_hash}
+		$https://github.com/mkfifo/linear\_hash : $
+		Librería de \textit{hash tables} en \verb|C| con un 93\% de cobertura de \textit{tests}. Provista bajo la licencia MIT.
+		
+		\bibitem{llvm1}
+		$http://gnuu.org/2009/09/18/writing-your-own-toy-compiler/ :$
+		Writing Your Own Toy Compiler Using Flex, Bison and LLVM.
+		
+		\bibitem{llvm2}
+		$http://llvm.org/docs/tutorial/$
+		Kaleidoscope: Implementing a Language with LLVM
+		
+		\bibitem{llvm3}
+		$https://github.com/llvm-mirror/llvm/tree/master/examples/BrainF :$
+		LLVM BrainF example.
+		
+	\end{thebibliography}
+
+
+\end{document}
