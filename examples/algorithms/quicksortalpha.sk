@@ -1,0 +1,36 @@
+/*
+	Quicksort as seen @www.wikipedia.com.
+	Enter the array of strings you want to sort.
+*/
+function partition(arr, lo, hi) {
+	var pivot = arr.get(hi);
+	var i = lo - 1;
+
+	var j = lo;
+	while (j <= hi) {
+		if (arr.get(j) <= pivot) {
+			i = i + 1;
+			if (i != j) {
+				var temp = arr.get(i);
+				arr.set(i, arr.get(j));
+				arr.set(j, temp);
+			}
+		}
+		j = j + 1;
+	}
+	return i
+}
+
+
+function quicksort(arr, lo, hi) {
+	if (lo < hi) {
+		var p = partition(arr, lo, hi)
+		quicksort(arr, lo, p - 1)
+		quicksort(arr, p + 1, hi)
+	}
+}
+print("Quicksort Alphabetical: Enter the space separated list of strings you want to order ")
+var arr = read().toArray()
+
+quicksort(arr, 0, arr.size() - 1)
+print("The sorted array: " + arr)
