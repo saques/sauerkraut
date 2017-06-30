@@ -1,0 +1,30 @@
+var user1= {
+    "name" : "JuanFra";
+    "age" : 15;
+    "grade": 8 ;
+}
+
+var user2= {
+    "name" : "Tomas";
+    "age" : 14;
+    "grade": 6;
+}
+
+var user3= {
+    "name" : "OTA";
+    "age" : 11;
+    "grade": 9;
+}
+
+var users = [user1, user2, user3]
+var i = users.size()
+var promAge = 0
+var promGrade = 0
+while(i>0) {
+    i = i-1
+    promAge = promAge + users.get(i).get("age")
+    promGrade = promGrade + users.get(i).get("grade")
+}
+
+printi(promAge/users.size())
+printi(promGrade/users.size())

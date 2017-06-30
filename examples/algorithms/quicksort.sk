@@ -1,6 +1,6 @@
 /*
 	Quicksort as seen @www.wikipedia.com.
-	Sauerkraut implementation.
+	Enter the array you want to sort.
 */
 function partition(arr, lo, hi) {
 	var pivot = arr.get(hi);
@@ -29,16 +29,14 @@ function quicksort(arr, lo, hi) {
 		quicksort(arr, p + 1, hi)
 	}
 }
-
-var maxn = 15000
-var arr = []
-var i = 20
-while (i > 0) {
-	arr + randn()%maxn
-	i = i - 1
+print("Quicksort: Enter the space separated list you want to order ")
+var arr = read().toArray()
+// Convert to int is necessary
+var i = 0
+while (i < arr.size()) {
+	arr[i] = arr[i].toInt()
+	i = i + 1
 }
 
-
 quicksort(arr, 0, arr.size() - 1)
-print(arr)
-
+print("The sorted array: " + arr)

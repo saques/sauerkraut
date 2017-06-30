@@ -3,6 +3,5 @@ print(arr)
 arr[0] = 25
 arr[1] = 75
 
-print(arr[2] = 12[10])
-
+print(arr[2] = 12)
 print(arr)

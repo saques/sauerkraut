@@ -1,0 +1,20 @@
+/*
+	Fibonacci series, using memoization.
+	Reads the N fibonacci number from the standard input.
+*/
+function fibonacci(n) {
+		var f = {}
+		var i = 2
+
+		f[0] = 0
+		f[1] = 1
+
+		while(i <= n){
+			f[i] = f[i-1]+ f[i-2]
+			i=i+1
+		}
+		return f[n]
+}
+print("Fibonacci series: Enter N")
+var n = read().toInt()
+print(n.toString() + " fibonacci number: " + fibonacci(n))

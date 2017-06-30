@@ -46,7 +46,9 @@ void * readi(){
 void * read(){
 	char * rec = NULL;
 	size_t i;
-	getline(&rec, &i, stdin);
+	size_t chars = getline(&rec, &i, stdin);
+	/* hack to remove \n */
+	rec[chars - 1 ] = '\0';
 	return (void *)newObject(newString(rec),stringClass());
 }
 

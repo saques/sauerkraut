@@ -6,12 +6,12 @@ print("size must be 1, and it's in fact: " + obj.size())
 print(obj.contains("cinco"))
 print(obj.contains("dos"))
 
-print("put dos, [2]")
-obj.put("dos",[2])
+print("set dos, [2]")
+obj.set("dos",[2])
 print("contains dos: " + obj.contains("dos"))
 
-print("put cinco, []")
-obj.put("cinco",[])
+print("set cinco, []")
+obj.set("cinco",[])
 print("get cinco: " + obj.get("cinco"))
 
 print("get dos")
