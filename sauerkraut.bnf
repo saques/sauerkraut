@@ -1,31 +1,38 @@
-<program>          ::= <expression> | <expression> <program>
-<expression>       ::= <declaration> | <instruction> 
-<declaration>      ::= <variable> | <function>
-<variable>         ::= <varkw> <whitespace> <identifier> <assignment> | <varkw> <whitespace> <identifier>
-<function>         ::= <funckw> <whitespace> <identifier> <commontofunc>
-<commontofunc>     ::= <arguments> <codeblock>
-<anonymousfunc>    ::= <anonfunckw> <commontofunc>
-<varkw>            ::= "var"
-<funckw>           ::= "function"
-<anonfunckw>       ::= "@"
-<whitespace>       ::= " "
-<assignment>       ::= <equals> <value>
-<equals>           ::= "="
-<value>            ::= <number> | <string> | <array> | <object> | <anonymousfunc>
-<array>            ::= "[" <values> "]" | "[ ]"
-<values>           ::= <value> "," <values> | <value>
-<object>           ::= "{" <objmembers> "}" | "{ }"
-<objmembers>       ::= <keyval> "," <objmembers> | <keyval> 
-<keyval>           ::= <identifier> ":" <value>
-<arguments>        ::= "(" <argument> ")" | "()"
-<argument>         ::= <identifier> "," <argument> | <identifier>
-<codeblock>        ::= <expression> <codeblock> | <end>
-<end>              ::= "end"
-
 /*
- *
- * TODO:
- * + Instructions
- * + Identifiers
- *
+ * Este archivo se complementa con 'sauerkraut.l',
+ * que contiene los tokens aquí utilizados.
  */
+
+
+<S>               ::= <ST>
+<ST>              ::= <EXPR> <DELIM> <ST> | <EXTERN_FUNC> <DELIM> <ST> | <FUNC> <DELIM> <ST> | <VAR> <DELIM> <ST> |
+                      <IF> <DELIM> <ST> | <WHILE> <DELIM> <ST> | <RET> <DELIM> | <DELIM> <ST> | /*empty*/
+<DELIM>           ::= ';' | '\n' 
+<RET>             ::= <RETKW> <I> 
+<EXPR>            ::= <INSTR> 
+<VAR>             ::= <VARKW> <IDENT> | <VARKW> <IDENT> '=' I
+<FUNC>            ::= <FUNKW> <IDENT> <ARGS> '{' <ST> '}' 
+<OBJECT>          ::= '{' <KV_SET> '}' 
+<KV_SET>          ::= <STR> ':' <I> <DELIM> <KV_SET> | <DELIM> <KV_SET> | /*empty*/ 
+<ARRAY>           ::= '[' <V_SET> ']' | '[' ']' 
+<V_SET>           ::= <I> ',' <V_SET> | <I>
+<ARGS>            ::= '(' <ARGSET> ')' | '(' ')'
+<ARGSET>          ::= <IDENT> | <IDENT> ',' <ARGSET>
+<IDENT>           ::= <ID>
+<EXTERN_FUNC>     ::= <EXTERNKW> <FUNKW> <IDENT> '(' <EXTERN_FUNC_ARGS> ')' | <EXTERNKW> <FUNKW> <IDENT> '(' ')'
+<EXTERN_FUNC_ARGS>::= <ID> | <ID> ',' <EXTERN_FUNC_ARGS>
+<INT>             ::= <INTEGER>
+<STR>             ::= <STRING>
+<INSTR>           ::= <I> | <ASSIGN>
+<CALL>            ::= <IDENT> '(' <PASSEDARGSPREV> ')' | <I> '.' <IDENT> '(' <PASSEDARGSPREV> ')'
+<PASSEDARGSPREV>  ::= <PASSEDARGS> | /*empty*/
+<PASSEDARGS>      ::= <I> ',' <PASSEDARGS> | <I>
+<WHILE>           ::= <WHILEKW> '(' <INSTR> ')' '{' <ST> '}'
+<IF>              ::= <IFKW> '(' <INSTR> ')' '{' <ST> '}' <ELSEKW> '{' <ST> '}' |
+                      <IFKW> '(' <INSTR> ')' '{' <ST> '}' 
+<ASSIGN>          ::= <IDENT> '=' <I>
+<I>               ::= <I> '+' <I> | '(' <I> ')' | <CALL> | <I> '-' <I> | <I> '*' <I> | <I> '/' <I> | <I> '%' <I> |
+                      <I> '<' <I> | <I> '>' <I> | <I> <LE> <I> | <I> <GE> <I> | <I> <EQ> <I> | <I> <NE> <I> |
+                      <I> <AND> <I> | <I> <OR> <I> | '!' <I> | '-' <I> | <I> '[' <I> ']' |  <I> '[' <I> ']' '=' <I> |
+                      <IDENT> | <VALUE>
+<VALUE>           ::= <INT> | <STR> | <ARRAY> | <OBJECT>
