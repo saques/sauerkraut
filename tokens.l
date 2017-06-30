@@ -11,9 +11,17 @@ L	[a-zA-Z_]
 D	[0-9]
 %option noyywrap
 %option yylineno
+%x C_COMMENT
+%x O_COMMENT
 %%
 
+
 [\t \n]
+"/*"		{ BEGIN(C_COMMENT); }
+<C_COMMENT>"*/"		{ BEGIN(INITIAL); }
+"//"		{ BEGIN(O_COMMENT);}
+<O_COMMENT>\n	{ BEGIN(INITIAL);}
+
 var			return VARKW;
 function		return FUNKW;
 end			return END;
