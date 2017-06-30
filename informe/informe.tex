@@ -14,7 +14,7 @@
 	\maketitle
 	
 	\begin{abstract}
-		\verb|Sauerkraut| es un lenguaje de programación débilmente y dinámicamente tipado, \textit{subyacentemente orientado a objetos}, que soporta un conjunto de tipos \textit{built-in} inspirado en las estructuras usadas con mayor habitualidad: \verb|Integer|, \verb|String|, \verb|Array| y \verb|Object| $($este último sintácticamente similar a los objetos de \verb|JavaScript|$)$.
+		\verb|Sauerkraut| es un lenguaje de programación débilmente y dinámicamente tipado, \textit{aspirante a ser orientado a objetos}, que soporta un conjunto de tipos \textit{built-in} inspirado en las estructuras usadas con mayor habitualidad: \verb|Integer|, \verb|String|, \verb|Array| y \verb|Object| $($este último sintácticamente similar a los objetos de \verb|JavaScript|$)$.
 		
 		El compilador se ha realizado en \verb|C++|, utilizando el entorno \verb|llvm| para la generación de código intermedio, y las herramientas \verb|lex| e \verb|yacc| para el \textit{tokenizado} y \textit{parsing} de la gramática respectivamente. \verb|clang|, el \textit{frontend} de \verb|llvm|, es utilizado para la generación de código ejecutable.
 	\end{abstract}
@@ -38,7 +38,7 @@
 	
 	\paragraph{} La intención fue desarrollar un lenguaje orientado a \textit{scripting}, por lo que las instrucciones se ejecutan en el orden de aparición en el archivo fuente. Es decir, no existe una función \verb|main()| declarada explícitamente por el usuario que sea el punto de entrada al programa. 
 	
-	\paragraph{} Por otro lado, en el resumen se ha mencionado que el lenguaje es \textit{subyacentemente orientado a objetos}. Esto quiere decir que, si bien actualmente el lenguaje no soporta la definición de nuevas clases, el diseño interno de la librería de \verb|Sauerkraut| está basado sobre una lógica de envío de métodos a objetos. A continuación se exhibirán algunas de las estructuras de la librería hecha en \verb|C| sobre las cuales se construyó dicha lógica:
+	\paragraph{} Por otro lado, en el resumen se ha mencionado que el lenguaje es \textit{aspirante a ser orientado a objetos}. Ciertamente, en su condición actual, no se puede decir que el lenguaje sea, efectivamente, orientado a objetos, dado que un programador no podría definir sus propia clases. Sin embargo, el diseño interno de la librería de \verb|Sauerkraut| está basado sobre una lógica de envío de métodos a objetos, es decir, las instancias de cada uno de los tipos implementados en la librería estándar. A continuación se exhibirán algunas de las estructuras de dicha librería hecha en \verb|C| sobre las cuales se construyó dicha lógica:
 
 	\begin{center}
 		\begin{lstlisting}[language=C]
