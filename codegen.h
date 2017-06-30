@@ -17,6 +17,7 @@
 #include <llvm/Support/raw_ostream.h>
 
 using namespace llvm;
+extern LLVMContext TheContext;
 
 class BlockNode;
 
@@ -36,7 +37,7 @@ class CodeGenContext {
 public:
 	Function *mainFunction;
     Module *module;
-    CodeGenContext() { module = new Module("main", getGlobalContext()); }
+    CodeGenContext() { module = new Module("main", TheContext); }
     bool generateCode(BlockNode& root, raw_ostream * out);
     GenericValue runCode();
     std::map<std::string, Value*>& locals() { return blocks.top()->locals; }

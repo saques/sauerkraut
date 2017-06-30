@@ -31,9 +31,9 @@ bool CodeGenContext::generateCode(BlockNode& root, raw_ostream * out)
 		   to see if our program compiled properly
 		 */
 		std::cerr << "Code is generated.\n";
-		PassManager<Module> pm;
-		pm.addPass(PrintModulePass(*out));
-		pm.run(*module);
+		// PassManager<Module> pm;
+		// pm.addPass(PrintModulePass(*out));
+		// pm.run(*module);
 		return true;
 	} else {
 		return false;

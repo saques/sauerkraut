@@ -2,15 +2,16 @@
 #include "codegen.h"
 #include "node.h"
 
+extern llvm::LLVMContext TheContext;
 using namespace std;
 
 void appendCoreFunction(CodeGenContext * context, const char * name, int arguments)
 {
 	vector<Type*> argTypes;
 	for (int i = 0; i < arguments; i++) {
-		argTypes.push_back(PointerType::get(IntegerType::get(getGlobalContext(), 8), 0));
+		argTypes.push_back(PointerType::get(IntegerType::get(TheContext, 8), 0));
 	}
-	FunctionType *ftype = FunctionType::get(PointerType::get(IntegerType::get(getGlobalContext(), 8), 0),
+	FunctionType *ftype = FunctionType::get(PointerType::get(IntegerType::get(TheContext, 8), 0),
 							makeArrayRef(argTypes), false);
 	Function * function = Function::Create(ftype, GlobalValue::ExternalLinkage,name, context->module);
 }
@@ -18,8 +19,8 @@ void appendCoreFunction(CodeGenContext * context, const char * name, int argumen
 void appendIntInit(CodeGenContext * context, const char * name)
 {
 	vector<Type*> argTypes;
-	argTypes.push_back(IntegerType::get(getGlobalContext(), 64));
-	FunctionType * ftype = FunctionType::get(PointerType::get(IntegerType::get(getGlobalContext(), 8), 0),
+	argTypes.push_back(IntegerType::get(TheContext, 64));
+	FunctionType * ftype = FunctionType::get(PointerType::get(IntegerType::get(TheContext, 8), 0),
 							makeArrayRef(argTypes), false);
 	Function * function = Function::Create(ftype, GlobalValue::ExternalLinkage, name, context->module);
 }
@@ -28,9 +29,9 @@ void appendIntInit(CodeGenContext * context, const char * name)
 void appendFuncexec(CodeGenContext* context, const char * name)
 {
 	vector<Type*> argTypes;
-	Type * voidp = PointerType::get(IntegerType::get(getGlobalContext(), 8), 0);
+	Type * voidp = PointerType::get(IntegerType::get(TheContext, 8), 0);
 	Type * voidpp = PointerType::get(voidp, 0);
-	Type * intty = IntegerType::get(getGlobalContext(), 64);
+	Type * intty = IntegerType::get(TheContext, 64);
 	argTypes.push_back(voidp);
 	argTypes.push_back(voidp);
 	argTypes.push_back(voidpp);
@@ -43,9 +44,9 @@ void appendFuncexec(CodeGenContext* context, const char * name)
 void appendArrayInit(CodeGenContext* context, const char * name)
 {
 	vector<Type*> argTypes;
-	Type * voidp = PointerType::get(IntegerType::get(getGlobalContext(), 8), 0);
+	Type * voidp = PointerType::get(IntegerType::get(TheContext, 8), 0);
 	Type * voidpp = PointerType::get(voidp, 0);
-	Type * intty = IntegerType::get(getGlobalContext(), 64);
+	Type * intty = IntegerType::get(TheContext, 64);
 	argTypes.push_back(voidpp);
 	argTypes.push_back(intty);
 	FunctionType * ftype = FunctionType::get(voidp,
@@ -56,9 +57,9 @@ void appendArrayInit(CodeGenContext* context, const char * name)
 void appendKVObjectInit(CodeGenContext* context, const char * name)
 {
 	vector<Type*> argTypes;
-	Type * voidp = PointerType::get(IntegerType::get(getGlobalContext(), 8), 0);
+	Type * voidp = PointerType::get(IntegerType::get(TheContext, 8), 0);
 	Type * voidpp = PointerType::get(voidp, 0);
-	Type * intty = IntegerType::get(getGlobalContext(), 64);
+	Type * intty = IntegerType::get(TheContext, 64);
 	argTypes.push_back(voidpp);
 	argTypes.push_back(voidpp);
 	argTypes.push_back(intty);
@@ -71,16 +72,16 @@ void appendKVObjectInit(CodeGenContext* context, const char * name)
 void appendStringInit(CodeGenContext * context, const char * name)
 {
 	vector<Type*> argTypes;
-	argTypes.push_back(PointerType::get(IntegerType::get(getGlobalContext(), 8), 0));
-	FunctionType *ftype = FunctionType::get(PointerType::get(IntegerType::get(getGlobalContext(), 8), 0),
+	argTypes.push_back(PointerType::get(IntegerType::get(TheContext, 8), 0));
+	FunctionType *ftype = FunctionType::get(PointerType::get(IntegerType::get(TheContext, 8), 0),
 							makeArrayRef(argTypes), false);
 	Function * function = Function::Create(ftype, GlobalValue::ExternalLinkage, name, context->module);
 }
 
 void appendEval(CodeGenContext * context, const char * name) {
 	vector<Type*> argTypes;
-	argTypes.push_back(PointerType::get(IntegerType::get(getGlobalContext(), 8), 0));
-	FunctionType *ftype = FunctionType::get(IntegerType::get(getGlobalContext(), 64),
+	argTypes.push_back(PointerType::get(IntegerType::get(TheContext, 8), 0));
+	FunctionType *ftype = FunctionType::get(IntegerType::get(TheContext, 64),
 							makeArrayRef(argTypes), false);
 	Function * function = Function::Create(ftype, GlobalValue::ExternalLinkage, name, context->module);
 }
