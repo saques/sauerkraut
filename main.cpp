@@ -21,17 +21,7 @@ OutputFilename("o", cl::desc("Output filename"), cl::value_desc("filename"));
 int main(int argc, char **argv)
 {
 	cl::ParseCommandLineOptions(argc, argv, " Sauerkraut compiler\n");
-	bool run = false;
-	bool llvms = false;
-	for (int i = 0; i < argc; i++) {
-		if (strcmp(argv[i], "-r")) {
-			/* run flag set to on */
-			run = true;
-		} else if (strcmp(argv[i], "-s")) {
-			/* compile to llvm set to on*/
-			llvms = true;
-		}
-	}
+	
 	if (InputFilename != "") {
 		if (freopen(InputFilename.c_str(), "r", stdin) == NULL) {
 			std::cerr << "Input file was not found." << std::endl;

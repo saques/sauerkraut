@@ -1,0 +1,11 @@
+function empty() {
+
+}
+
+print(empty())
+
+
+var a = 10
+var a = 12
+
+print("hello")

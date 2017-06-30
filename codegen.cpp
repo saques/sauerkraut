@@ -9,6 +9,7 @@ Value * createCharArray(CodeGenContext& context, std::string stri);
 Value* expressionListPointerArray(CodeGenContext& context, ExpressionList elements);
 Value * eval(CodeGenContext& context, Value * value);
 
+static int COMPILATIONFAIL = false;
 /* Compile the AST into a module */
 bool CodeGenContext::generateCode(BlockNode& root, raw_ostream * out)
 {
@@ -25,7 +26,6 @@ bool CodeGenContext::generateCode(BlockNode& root, raw_ostream * out)
 	 /* emit bytecode for the toplevel block */
 	if (root.codeGen(*this) != NULL) {
 		builder.CreateRet(ConstantInt::get(Type::getInt64Ty(TheContext), 0, true));
-
 		popBlock();
 		/* Print the bytecode in a human-readable format
 		   to see if our program compiled properly
@@ -35,6 +35,7 @@ bool CodeGenContext::generateCode(BlockNode& root, raw_ostream * out)
 		out->flush();
 		return true;
 	} else {
+		std::cerr << "Compilation failed" << endl;
 		return false;
 	}
 }
@@ -47,6 +48,8 @@ Value* IntegerNode::codeGen(CodeGenContext& context)
 	Function *function = context.module->getFunction("newIntegerObj");
 	if (function == NULL) {
 		std::cerr << "no such function (coreCoreFunctionFail) " << "newIntegerObj"<< endl;
+		COMPILATIONFAIL = true;
+		return NULL;
 	}
 	std::vector<Value*> args;
 	args.push_back(ConstantInt::get(Type::getInt64Ty(TheContext), value, true));
@@ -60,6 +63,8 @@ Value* StringNode::codeGen(CodeGenContext& context)
 	Function *function = context.module->getFunction("newStringObj");
 	if (function == NULL) {
 		std::cerr << "no such function (coreCoreFunctionFail) " << "newStringObj"<< endl;
+		COMPILATIONFAIL = true;
+		return NULL;
 	}
 	std::vector<Value*> args;
 	args.push_back(createCharArray(context,s));
@@ -98,14 +103,12 @@ Value* ArrayCreationNode::codeGen(CodeGenContext& context)
 	Function *function = context.module->getFunction("newArrayObj");
 	if (function == NULL) {
 		std::cerr << "no such function (coreCoreFunctionFail) " << "newArrayObj"<< endl;
+		COMPILATIONFAIL = true;
+		return NULL;
 	}
-
 	std::vector<Value*> args;
-
 	args.push_back(expressionListPointerArray(context,elements));
-
 	args.push_back(ConstantInt::get(Type::getInt64Ty(TheContext), elements.size(), true));
-
 	CallInst *call = CallInst::Create(function, makeArrayRef(args), "", context.currentBlock());
 	return call;
 }
@@ -117,15 +120,13 @@ Value* KVObjectCreationNode::codeGen(CodeGenContext& context)
 	Function *function = context.module->getFunction("newKVObjectObj");
 	if (function == NULL) {
 		std::cerr << "no such function (coreCoreFunctionFail) " << "newKVObjectObj"<< endl;
+		COMPILATIONFAIL = true;
+		return NULL;
 	}
-
 	std::vector<Value*> args;
-
 	args.push_back(expressionListPointerArray(context,keys));
 	args.push_back(expressionListPointerArray(context,values));
-
 	args.push_back(ConstantInt::get(Type::getInt64Ty(TheContext), keys.size(), true));
-
 	CallInst *call = CallInst::Create(function, makeArrayRef(args), "", context.currentBlock());
 	return call;
 }
@@ -136,6 +137,7 @@ Value* IdentifierNode::codeGen(CodeGenContext& context)
 	std::cerr << "Creating identifier reference: " << name << endl;
 	if (context.locals().find(name) == context.locals().end()) {
 		std::cerr << "undeclared variable " << name << endl;
+		COMPILATIONFAIL = true;
 		return NULL;
 	}
 	return new LoadInst(context.locals()[name], "", false, context.currentBlock());
@@ -146,6 +148,7 @@ Value* AssignmentNode::codeGen(CodeGenContext& context)
 	std::cerr << "Creating assignment for " << ident.name << endl;
 	if (context.locals().find(ident.name) == context.locals().end()) {
 		std::cerr << "undeclared variable " << ident.name << endl;
+		COMPILATIONFAIL = true;
 		return NULL;
 	}
 	return new StoreInst(value.codeGen(context), context.locals()[ident.name], false, context.currentBlock());
@@ -166,6 +169,7 @@ Value* VariableDeclarationNode::codeGen(CodeGenContext& context)
 		return alloc;
 	} else {
 		std::cerr << "Duplicate variable declaration " << id.name << "; compilation error." << endl;
+		COMPILATIONFAIL = true;
 		return NULL;
 	}
 
@@ -210,6 +214,8 @@ Value* FunctionCallNode::codeGen(CodeGenContext& context)
 	Function *function = context.module->getFunction(id.name);
 	if (function == NULL) {
 		std::cerr << "no such function " << id.name << endl;
+		COMPILATIONFAIL = true;
+		return NULL;
 	}
 	std::vector<Value*> args;
 	ExpressionList::const_iterator it;
@@ -261,7 +267,9 @@ Value * createCharArray(CodeGenContext& context, std::string stri)
 Value * MethodInvocationNode::codeGen(CodeGenContext& context){
 	Function * function = context.module->getFunction("funcexec");
 	if (function == NULL) {
-		std::cerr << "no such function (coreCoreFunctionFail) " << "funcexec"<< endl;
+		std::cerr << "No such function (coreCoreFunctionFail) " << "funcexec"<< endl;
+		COMPILATIONFAIL = true;
+		return NULL;
 	}
 	std::vector<Value*> args;
 	args.push_back(object.codeGen(context));
@@ -277,17 +285,17 @@ Value * UnaryOperationNode::codeGen(CodeGenContext& context)
 {
 	Function * function = context.module->getFunction("funcexec");
 	if (function == NULL) {
-		std::cerr << "no such function (coreCoreFunctionFail) " << "funcexec"<< endl;
+		std::cerr << "No such function (coreCoreFunctionFail) " << "funcexec"<< endl;
+		COMPILATIONFAIL = true;
+		return NULL;
 	}
 	std::vector<Value*> args;
 	args.push_back(lhs.codeGen(context));
 	auto zero = ConstantInt::get(TheContext, llvm::APInt(64, 0, true));
 	auto index = ConstantInt::get(TheContext, llvm::APInt(32, 0, true));
-
 	args.push_back(createCharArray(context, methodName.c_str()));
 	Type * voidp = PointerType::get(IntegerType::get(TheContext, 8), 0);
 	ArrayType* arrayType = ArrayType::get(voidp, 2);
-
 	Value* arr_alloc = new AllocaInst(
 			arrayType, "sumarray", context.currentBlock()
 	);
@@ -305,7 +313,9 @@ Value * BinaryOperationNode::codeGen(CodeGenContext& context)
 {
 	Function * function = context.module->getFunction("funcexec");
 	if (function == NULL) {
-		std::cerr << "no such function (coreCoreFunctionFail) " << "funcexec"<< endl;
+		std::cerr << "No such function (coreCoreFunctionFail) " << "funcexec"<< endl;
+		COMPILATIONFAIL = true;
+		return NULL;
 	}
 	std::vector<Value*> args;
 	args.push_back(lhs.codeGen(context));
@@ -322,7 +332,6 @@ Value * BinaryOperationNode::codeGen(CodeGenContext& context)
 	Value* arr_alloc = new AllocaInst(
 	    arrayType, "sumarray", context.currentBlock()
 	);
-
 
 	auto ptr = GetElementPtrInst::Create(arrayType, arr_alloc, { zero, index }, "", context.currentBlock());
 	auto store = new llvm::StoreInst(rhs.codeGen(context), ptr, false, context.currentBlock());
@@ -359,7 +368,10 @@ Value * FunctionDeclarationNode::codeGen(CodeGenContext& context)
 		StoreInst *inst = new StoreInst(argumentValue, context.locals()[(*it)->id.name], false, bblock);
 	}
 
-	block.codeGen(context);
+	if (block.codeGen(context) == NULL && COMPILATIONFAIL) {
+		cerr << "Function "<< id.name <<" declaration failed" << endl;
+		return NULL;
+	}
 	if (context.getCurrentReturnValue() == NULL) {
 		builder.CreateRet(IntegerNode(0).codeGen(context));
 	}
@@ -389,7 +401,9 @@ Value * eval(CodeGenContext& context, Value * value)
 {
 	Function * function = context.module->getFunction("eval");
 	if (function == NULL) {
-		std::cerr << "no such function (coreCoreFunctionFail) " << "eval"<< endl;
+		std::cerr << "No such function (coreCoreFunctionFail) " << "eval"<< endl;
+		COMPILATIONFAIL = true;
+		return NULL;
 	}
 	std::vector<Value*> args;
 	args.push_back(value);
@@ -411,6 +425,7 @@ Value * IfNode::codeGen(CodeGenContext& context)
 
 	Value * condVal = eval(context, expression.codeGen(context));
 	if (condVal == NULL) {
+		COMPILATIONFAIL = true;
 		return NULL;
 	}
 	condVal = builder.CreateICmpNE(
@@ -422,6 +437,10 @@ Value * IfNode::codeGen(CodeGenContext& context)
 	context.pushBlock(ThenBB);
 	builder.SetInsertPoint(ThenBB);
 	Value * ThenV = thenBlock.codeGen(context);
+	if (ThenV == NULL && COMPILATIONFAIL == true) {
+		cerr << "Then block code generation failed " << endl;
+		return NULL;
+	}
 	ThenBB = builder.GetInsertBlock();
 	bool thenReturns = context.getCurrentReturnValue() != NULL ? true : false;
 	context.popBlock();
@@ -431,6 +450,10 @@ Value * IfNode::codeGen(CodeGenContext& context)
 	context.pushBlock(ElseBB);
 	builder.SetInsertPoint(ElseBB);
 	Value *ElseV = elseBlock.codeGen(context);
+	if (ElseV == NULL && COMPILATIONFAIL == true) {
+		cerr << "Else block code generation failed " << endl;
+		return NULL;
+	}
 	bool elseReturns = context.getCurrentReturnValue() != NULL ? true : false;
 	context.popBlock();
 	context.popBlock();
@@ -460,6 +483,7 @@ Value * WhileNode::codeGen(CodeGenContext& context) {
 	context.pushBlock(LoopCond);
 	Value * condVal = eval(context, expression.codeGen(context));
 	if (condVal == NULL) {
+		COMPILATIONFAIL = true;
 		return NULL;
 	}
 	condVal = builder.CreateICmpNE(
@@ -473,6 +497,10 @@ Value * WhileNode::codeGen(CodeGenContext& context) {
 	context.pushBlock(BodyBlock);
 	builder.SetInsertPoint(BodyBlock);
 	Value * BodyV = thenBlock.codeGen(context);
+	if (BodyV == NULL && COMPILATIONFAIL == true) {
+		cerr << "While then code generation failed" << endl;
+		return NULL;
+	}
 	bool bodyReturns = context.getCurrentReturnValue() != NULL ? true : false;
 	context.popBlock();
 	context.popBlock();

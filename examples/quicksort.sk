@@ -1,17 +1,17 @@
 /*
-	Partition part of quicksort
+	Quicksort as seen @www.wikipedia.com.
+	Sauerkraut implementation.
 */
 function partition(arr, lo, hi) {
 	var pivot = arr.get(hi);
 	var i = lo - 1;
 
 	var j = lo;
-	var temp;
 	while (j <= hi) {
 		if (arr.get(j) <= pivot) {
 			i = i + 1;
 			if (i != j) {
-				temp = arr.get(i);
+				var temp = arr.get(i);
 				arr.set(i, arr.get(j));
 				arr.set(j, temp);
 			}
