@@ -44,7 +44,7 @@ void yyerror(const char * s){
 
 %type <st>	    FUNC VAR EXPR EXTERN_FUNC RET IF WHILE
 %type <ident> 	IDENT
-%type <block> 	ST BLOCK
+%type <block> 	ST
 %type <arg_list> ARGS ARGSET
 %type <expr>	INSTR VALUE INT CALL I STR ASSIGN ARRAY OBJECT
 %type <obj_cr>  KV_SET
@@ -249,8 +249,6 @@ STR			: STRING
 				$$ = new StringNode($1);
 			}
 
-BLOCK		: EXPR  BLOCK | /*empty*/ ;
-
 INSTR		: I | ASSIGN ;
 
 
@@ -328,11 +326,11 @@ I		:  I '+' I
         }
 		| I '*' I
 		{
-                    $$ = new BinaryOperationNode(*$1, *$3,"multiply");
+            $$ = new BinaryOperationNode(*$1, *$3,"multiply");
                 }
 		| I '/' I
 		{
-                    $$ = new BinaryOperationNode(*$1, *$3,"divide");
+             $$ = new BinaryOperationNode(*$1, *$3,"divide");
                 }
 		| I '<' I
 		{
@@ -369,7 +367,11 @@ I		:  I '+' I
 		| IDENT
 		| VALUE;
 
-VALUE		: INT | STR | ARRAY | OBJECT;
+VALUE		: INT | STR | ARRAY | OBJECT
+            |
+            '-' INT {
+                $$ = new BinaryOperationNode((ExpressionNode&)*(new IntegerNode(0)), *$2,"subtract");
+            };
 
 %%
 void line(char * s){
