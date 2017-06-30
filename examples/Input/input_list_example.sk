@@ -1,0 +1,8 @@
+var list = read().toArray()
+
+var i = 0
+
+while (i < list.size()) {
+	print("elemento " + i.toString() + ": "+ list.get(i));
+	i = i + 1
+}

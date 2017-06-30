@@ -4,6 +4,7 @@
 #include "include/Object.h"
 #include "include/Integer.h"
 #include "include/ErrorPrint.h"
+#include "include/Array.h"
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -17,7 +18,7 @@ static Class * sClass = NULL;
 /*
  * METHODS FOR String
  */
-const static int NMETHODS = 10;
+const static int NMETHODS = 11;
 
 bool isnumber(const char * s) {
 		while (*s != 0 && *s == ' ') s++;
@@ -222,6 +223,38 @@ Object * notString(void * obj, void ** args, int nArgs){
 	i->i = !i->i;
 	return o;
 }
+
+Object * toArrayString(void * obj, void ** args, int nArgs) {
+	if(nArgs!=0){
+		errorout("String::toArray expects 0 arguments");
+		exit(1);
+	}
+	String * this = (String *)((Object *)obj)->instance;
+	const char * sptr = this->s;
+	int len = this->len;
+	Object ** arr = malloc(sizeof(Object *) * len);
+	int count = 0;
+	while (*sptr != 0 && *sptr != '\n' ) {
+		while(*sptr != 0 && *sptr != '\n' && *sptr == ' ') sptr++;
+		int c = 0;
+		const char * tptr = sptr;
+		while(*sptr != 0 && *sptr != '\n' && *sptr != ' ') {
+			sptr++;
+			c++;
+		}
+		if (c > 0) {
+			char * nstr = malloc(c + 1);
+			strncpy(nstr, tptr, c);
+			nstr[c] = 0;
+			arr[count] = newObject(newString(nstr), stringClass());
+			count++;
+			free(nstr);
+		}
+	}
+	Object* ret = newObject(newArray((void **)arr, count), arrayClass());
+	free(arr);
+	return ret;
+}
 /*
  * END METHODS FOR String
  */
@@ -245,6 +278,7 @@ Class * stringClass(){
 	sClass->methods[7] = newObject(newMethod((function)getString,"get"),methodClass());
 	sClass->methods[8] = newObject(newMethod((function)setString,"set"),methodClass());
 	sClass->methods[9] = newObject(newMethod((function)notString,"not"),methodClass());
+	sClass->methods[10] = newObject(newMethod((function)toArrayString,"toArray"),methodClass());
 	return sClass;
 }
 
