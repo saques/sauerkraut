@@ -48,7 +48,7 @@ void yyerror(const char * s){
 %type <arg_list> ARGS ARGSET
 %type <expr>	INSTR VALUE INT CALL I STR ASSIGN ARRAY OBJECT
 %type <obj_cr>  KV_SET
-%type <expr_list> PASSEDARGS
+%type <expr_list> PASSEDARGS PASSEDARGSPREV
 %type <i> INTEGER EXTERN_FUNC_ARGS
 %type <s> ID STRING
 
@@ -56,7 +56,8 @@ void yyerror(const char * s){
 
 
 %right "="
-%left OR AND
+%left OR
+%left AND
 %left '>' '<' LE GE EQ NE
 %left '+' '-'
 %left '*' '/'
@@ -74,36 +75,40 @@ ST		: EXPR DELIM ST
 			$$ = $3;
 			$3->statements.push_front($<st>1);
 		}
-		| EXTERN_FUNC ST
+		| EXTERN_FUNC DELIM ST
 		{
-			$$ = $2;
-			$2->statements.push_front($<st>1);
+			$$ = $3;
+			$3->statements.push_front($<st>1);
 		}
-		| FUNC ST
+		| FUNC DELIM ST
 		{
-			$$ = $2;
-			$2->statements.push_front($<st>1);
+			$$ = $3;
+			$3->statements.push_front($<st>1);
 		}
 		| VAR DELIM ST
 		{
 			$$ = $3;
 			$3->statements.push_front($<st>1);
 		}
-		| IF ST
+		| IF DELIM ST
 		{
 
-			$$ = $2;
-			$2->statements.push_front($<st>1);
+			$$ = $3;
+			$3->statements.push_front($<st>1);
 		}
-		|	WHILE ST
+		|	WHILE DELIM ST
 		{
-			$$ = $2;
-			$2->statements.push_front($<st>1);
+			$$ = $3;
+			$3->statements.push_front($<st>1);
 		}
 		| RET DELIM
 		{
 			$$ = new BlockNode();
 			$$->statements.push_front($<st>1);
+		}
+		| DELIM ST
+		{
+			$$ = $2;
 		}
 		| /*empty*/
 		{
@@ -112,7 +117,7 @@ ST		: EXPR DELIM ST
 		;
 
 DELIM	:	';'
-		|
+		| '\n'
 		;
 
 RET		: RETKW I
@@ -154,20 +159,23 @@ OBJECT		: '{' KV_SET '}'
 				$$ = new KVObjectCreationNode(*keys,*values);
 			 };
 
-KV_SET		:  STR ':' I ';' KV_SET
+KV_SET		:  STR ':' I DELIM KV_SET
 			 {
 				$$ = $5;
 				$$->keys.push_front($1);
 				$$->values.push_front($3);
 			 }
-             | STR ':' I ';'
-             {
+			 | DELIM KV_SET
+			 {
+				 $$ = $2;
+			 }
+			 | /* End of declaration block */
+			 {
 				ExpressionList * keys = new ExpressionList();
-				ExpressionList * values = new ExpressionList();
-				keys->push_front($1);
-				values->push_front($3);
+ 				ExpressionList * values = new ExpressionList();
 				$$ = new KVObjectCreationNode(*keys,*values);
-             };
+			 }
+			 ;
 
 
 ARRAY		: '['V_SET']'
@@ -256,16 +264,11 @@ STR			: STRING
 INSTR		: I | ASSIGN ;
 
 
-CALL		:  IDENT '(' PASSEDARGS ')'
+CALL		:  IDENT '(' PASSEDARGSPREV ')'
 			{
 				$$ = new FunctionCallNode(*$1, *$3);
 			}
-			| IDENT '(' ')'
-			{
-				ExpressionList *list = new ExpressionList();
-				$$ = new FunctionCallNode(*$1, *list);
-			}
-			| I'.'IDENT'('PASSEDARGS')'
+			| I'.'IDENT'('PASSEDARGSPREV')'
 			{
 				$$ = new MethodInvocationNode(*$1,*$3,*$5);
 			}
@@ -275,6 +278,13 @@ CALL		:  IDENT '(' PASSEDARGS ')'
 				$$ = new MethodInvocationNode(*$1,*$3,*list);
 			}
 			;
+
+PASSEDARGSPREV : PASSEDARGS
+			   |
+			   {
+				   $$ = new ExpressionList();
+			   }
+			   ;
 
 PASSEDARGS	:   I ',' PASSEDARGS
 		        {
@@ -295,7 +305,7 @@ WHILE		: WHILEKW '(' INSTR ')' '{' ST '}'
 			}
 			;
 
-IF	:	IFKW	'(' INSTR ')' '{' ST '}' 	ELSEKW '{' ST '}'
+IF	:	IFKW	'(' INSTR ')' '{' ST '}' ELSEKW '{' ST '}'
  	{
 		$$ = new IfNode(*$3, *$6, *$10);
 	}
@@ -312,7 +322,7 @@ ASSIGN		: IDENT '=' I
 			};
 
 
-I		:  I '+' I
+I		: I '+' I
 		{
 			$$ = new BinaryOperationNode(*$1, *$3,"sum");
 		}
@@ -359,23 +369,28 @@ I		:  I '+' I
 		| I NE I
 		{
                     $$ = NOT(*(EQUAL(*$1,*$3)));
-                }
-		| I OR I
-		{
-                    $$ = new BinaryOperationNode(*$1, *$3,"or");
-                }
+        }
 		| I AND I
 		{
-                    $$ = new BinaryOperationNode(*$1, *$3,"and");
-                }
+			$$ = new BinaryOperationNode(*$1, *$3,"and");
+		}
+		| I OR I
+		{
+			$$ = new BinaryOperationNode(*$1, *$3,"or");
+		}
+		|'!' I	%prec '*'
+  		{
+			$$ = NOT(*$2);
+		}
+		| '-' I %prec '*'
+		{
+			$$ =  new BinaryOperationNode((ExpressionNode&)*(new IntegerNode(0)), *$2,"subtract");
+		}
 		| IDENT
 		| VALUE;
 
 VALUE		: INT | STR | ARRAY | OBJECT
-            |
-            '-' INT {
-                $$ = new BinaryOperationNode((ExpressionNode&)*(new IntegerNode(0)), *$2,"subtract");
-            };
+            ;
 
 %%
 void line(char * s){

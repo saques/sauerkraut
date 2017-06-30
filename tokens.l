@@ -13,10 +13,11 @@ D	[0-9]
 %option yylineno
 %x C_COMMENT
 %x O_COMMENT
+
 %%
 
-
-[\t \n]
+[\t ]
+<<EOF>>		 { static int once = 0; return once++ ? 0 : '\n'; }
 "/*"		{ BEGIN(C_COMMENT); }
 <C_COMMENT>"*/"		{ BEGIN(INITIAL); }
 "//"		{ BEGIN(O_COMMENT);}
@@ -44,4 +45,6 @@ L?\"(\\.|[^\\"])*\"	{token = strtok(yytext,"\"");
 "||"			return OR;
 "&&"			return AND;
 .			return yytext[0];
+\n			return yytext[0];
+
 %%
