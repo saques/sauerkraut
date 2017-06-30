@@ -53,6 +53,25 @@ public:
 			blocks.top()->locals.insert(oldTop->locals.begin(), oldTop->locals.end());
 		}
 	}
+
+	void pushBlock(BasicBlock * block, bool keepLocals) {
+		CodeGenBlock * oldTop = NULL;
+		if (keepLocals == true) {
+			if (!blocks.empty()) {
+				oldTop = blocks.top();
+			}
+		}
+		blocks.push(new CodeGenBlock());
+		blocks.top()->returnValue = NULL;
+		blocks.top()->block = block;
+		if (keepLocals == true) {
+			if (oldTop != NULL) {
+				blocks.top()->locals.insert(oldTop->locals.begin(), oldTop->locals.end());
+			}
+		}
+	}
+
+
 	void pushBlock(BasicBlock *block, std::map<std::string, Value*> locals) {
 		CodeGenBlock * oldTop = NULL;
 		if (!blocks.empty()) {

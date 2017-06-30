@@ -23,13 +23,9 @@ bool CodeGenContext::generateCode(BlockNode& root, raw_ostream * out)
 	builder.SetInsertPoint(bblock);
 	/* Push a new variable/block context */
 	pushBlock(bblock);
-	 /* emit bytecode for the toplevel block */
 	if (root.codeGen(*this) != NULL) {
 		builder.CreateRet(ConstantInt::get(Type::getInt64Ty(TheContext), 0, true));
 		popBlock();
-		/* Print the bytecode in a human-readable format
-		   to see if our program compiled properly
-		 */
 		std::cerr << "......Code is generated......" << endl;
 		*out << *module;
 		out->flush();
@@ -416,7 +412,8 @@ Value * FunctionDeclarationNode::codeGen(CodeGenContext& context)
 	Function *function = Function::Create(ftype, GlobalValue::InternalLinkage, id.name, context.module);
 	BasicBlock *bblock = BasicBlock::Create(TheContext, "entry", function, 0);
 	builder.SetInsertPoint(bblock);
-	context.pushBlock(bblock);
+	/// dont keep local variables.
+	context.pushBlock(bblock, false);
 
 	Function::arg_iterator argsValues = function->arg_begin();
     Value* argumentValue;
