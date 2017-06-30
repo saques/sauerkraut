@@ -22,8 +22,8 @@ var promAge = 0
 var promGrade = 0
 while(i>0) {
     i = i-1
-    promAge = promAge + users.get(i).get("age")
-    promGrade = promGrade + users.get(i).get("grade")
+    promAge = promAge + users[i].get("age")
+    promGrade = promGrade + users[i].get("grade")
 }
 
 printi(promAge/users.size())

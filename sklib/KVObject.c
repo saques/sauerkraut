@@ -39,9 +39,9 @@ Object * contains(void * this, void ** args, int nArgs){
 	return newObject(newInteger(ret),integerClass());
 }
 
-Object * putObj(void * this, void ** args, int nArgs){
+Object * setObj(void * this, void ** args, int nArgs){
 	if(nArgs!=2){
-		errorout("Object::put expects 2 arguments");
+		errorout("Object::set expects 2 arguments");
 		exit(1);
 	}
 	
@@ -143,7 +143,7 @@ Class * KVObjectClass(){
 	kvClass = newClass(OBJECT,NMETHODS);
 
 	kvClass->methods[0] = newObject(newMethod((function)contains,"contains"),methodClass());
-	kvClass->methods[1] = newObject(newMethod((function)putObj,"put"),methodClass());
+	kvClass->methods[1] = newObject(newMethod((function)setObj,"set"),methodClass());
 	kvClass->methods[2] = newObject(newMethod((function)getObj,"get"),methodClass());
 	kvClass->methods[3] = newObject(newMethod((function)removeObj,"remove"),methodClass());
 	kvClass->methods[4] = newObject(newMethod((function)sizeObj,"size"),methodClass());
