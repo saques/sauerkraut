@@ -1,7 +1,0 @@
-var s = "hola"
-
-var n = "negreada   "+s
-n=readi(s)
-
-print(n)
-

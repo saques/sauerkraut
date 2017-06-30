@@ -1,2 +1,0 @@
-var a = "aaaa" <= "b"
-printi(a)

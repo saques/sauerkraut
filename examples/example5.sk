@@ -1,5 +1,0 @@
-function helloWorld(a, b, c) {
-	return a + b + c
-}
-
-printi(helloWorld(4,5,10))
