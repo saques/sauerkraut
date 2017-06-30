@@ -96,5 +96,6 @@ void createCoreFunctions(CodeGenContext& context){
 	appendCoreFunction(&context,"print",1);
 	appendCoreFunction(&context,"readi",0);
 	appendCoreFunction(&context,"read",0);
+	appendCoreFunction(&context,"randn",0);
 	appendEval(&context, "eval");
 }

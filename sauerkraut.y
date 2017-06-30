@@ -60,7 +60,7 @@ void yyerror(const char * s){
 %left AND
 %left '>' '<' LE GE EQ NE
 %left '+' '-'
-%left '*' '/'
+%left '*' '/' '%'
 %left '!'
 %%
 
@@ -345,7 +345,12 @@ I		: I '+' I
 		| I '/' I
 		{
              $$ = new BinaryOperationNode(*$1, *$3,"divide");
-                }
+        }
+        |
+          I '%' I
+        {
+			$$ = new BinaryOperationNode(*$1, *$3,"modulo");
+        }
 		| I '<' I
 		{
                     $$ = LOWER(*$1,*$3);
