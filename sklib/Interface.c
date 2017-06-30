@@ -47,8 +47,7 @@ void * read(){
 	char * rec = NULL;
 	size_t i;
 	getline(&rec, &i, stdin);
-	char * n = strdup(rec);
-	return (void *)newObject(newString(n),stringClass());
+	return (void *)newObject(newString(rec),stringClass());
 }
 
 int eval(void * obj)
