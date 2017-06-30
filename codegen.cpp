@@ -31,31 +31,12 @@ bool CodeGenContext::generateCode(BlockNode& root, raw_ostream * out)
 		   to see if our program compiled properly
 		 */
 		std::cerr << "Code is generated.\n";
-		// PassManager<Module> pm;
-		// pm.addPass(PrintModulePass(*out));
-		// pm.run(*module);
+		*out << *module;
+		out->flush();
 		return true;
 	} else {
 		return false;
 	}
-}
-
-/* Executes the AST by running the main function */
-GenericValue CodeGenContext::runCode() {
-	if (module != NULL) {
-		std::cerr << "Running code...\n";
-
-		ExecutionEngine *ee = EngineBuilder( unique_ptr<Module>(module) ).create();
-		ee->finalizeObject();
-		vector<GenericValue> noargs;
-		GenericValue v = ee->runFunction(mainFunction, noargs);
-		std::cerr << "Code was run.\n";
-		return v;
-	} else {
-		GenericValue a;
-		return a;
-	}
-
 }
 
 /* -- Code Generation -- */
