@@ -26,6 +26,7 @@ do
     else
         ./a.out > /dev/null
     fi
+    echo
   else
     echo - TEST SUCCESFUL: $f
    fi
