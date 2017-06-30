@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <string.h>
 #include "include/Object.h"
 #include "include/Integer.h"
 #include "include/String.h"
@@ -43,9 +44,11 @@ void * readi(){
 }
 
 void * read(){
-	char * rec = malloc(BUFSIZE);
-	scanf("%s",rec);
-	return (void *)newObject(newString(rec),stringClass());
+	char * rec = NULL;
+	size_t i;
+	getline(&rec, &i, stdin);
+	char * n = strdup(rec);
+	return (void *)newObject(newString(n),stringClass());
 }
 
 int eval(void * obj)
