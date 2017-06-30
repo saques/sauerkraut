@@ -3,6 +3,6 @@ var list = read().toArray()
 var i = 0
 
 while (i < list.size()) {
-	print("elemento " + i.toString() + ": "+ list.get(i));
+	print("elemento " + i.toString() + ": "+ list[i]);
 	i = i + 1
 }

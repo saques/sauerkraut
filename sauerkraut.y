@@ -64,6 +64,7 @@ void yyerror(const char * s){
 %left '*' '/' '%'
 %right '!'
 %left '.'
+%left '['
 %%
 
 S		: ST
@@ -227,6 +228,7 @@ IDENT		: ID
 			{
 				$$ = new IdentifierNode($1);
 			}
+			;
 
 EXTERN_FUNC		: EXTERNKW FUNKW IDENT '(' EXTERN_FUNC_ARGS ')'
 				{
@@ -382,6 +384,10 @@ I		: I '+' I
 		| '-' I %prec '*'
 		{
 			$$ =  new BinaryOperationNode((ExpressionNode&)*(new IntegerNode(0)), *$2,"subtract");
+		}
+		| I '[' I ']'
+		{
+			$$ = new BinaryOperationNode(*$1, *$3, "get");
 		}
 		| IDENT
 		{
