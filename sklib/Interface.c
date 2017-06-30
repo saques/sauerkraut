@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 #include "include/Object.h"
 #include "include/Integer.h"
 #include "include/String.h"
@@ -8,6 +9,8 @@
 #include "include/KVObject.h"
 #define INT0 (void *)newObject(newInteger(0),integerClass())
 #define BUFSIZE 32
+
+static int timeSet = 0;
 
 void * newIntegerObj(int64_t i){
 	return (void *)newObject(newInteger(i),integerClass());
@@ -61,4 +64,12 @@ void * print(void * v){
 	String * s = (String *)o->instance;
 	printf("%s\n",s->s);
 	return INT0;
+}
+
+void * randn(){
+	if(!timeSet){
+		srand(time(NULL));
+		timeSet = 1;
+	}
+	return newObject(newInteger((int64_t)rand()),integerClass());
 }

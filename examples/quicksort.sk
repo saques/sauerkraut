@@ -30,14 +30,15 @@ function quicksort(arr, lo, hi) {
 	}
 }
 
+var maxn = 15000
 var arr = []
-var i = 1000
+var i = 20
 while (i > 0) {
-	arr + i
+	arr + randn()%maxn
 	i = i - 1
 }
 
 
 quicksort(arr, 0, arr.size() - 1)
-//print(arr)
-print("hola")
+print(arr)
+
