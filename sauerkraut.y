@@ -56,12 +56,14 @@ void yyerror(const char * s){
 
 
 %right "="
+
 %left OR
 %left AND
 %left '>' '<' LE GE EQ NE
 %left '+' '-'
 %left '*' '/'
-%left '!'
+%right '!'
+%left '.'
 %%
 
 S		: ST
@@ -152,12 +154,7 @@ OBJECT		: '{' KV_SET '}'
 			 {
 				$$ = $2;
 			 }
-			 |'{' '}'
-			 {
-				ExpressionList * keys = new ExpressionList();
-				ExpressionList * values = new ExpressionList();
-				$$ = new KVObjectCreationNode(*keys,*values);
-			 };
+			 ;
 
 KV_SET		:  STR ':' I DELIM KV_SET
 			 {
@@ -272,11 +269,6 @@ CALL		:  IDENT '(' PASSEDARGSPREV ')'
 			{
 				$$ = new MethodInvocationNode(*$1,*$3,*$5);
 			}
-			| I'.'IDENT'(' ')'
-			{
-				ExpressionList *list = new ExpressionList();
-				$$ = new MethodInvocationNode(*$1,*$3,*list);
-			}
 			;
 
 PASSEDARGSPREV : PASSEDARGS
@@ -387,6 +379,9 @@ I		: I '+' I
 			$$ =  new BinaryOperationNode((ExpressionNode&)*(new IntegerNode(0)), *$2,"subtract");
 		}
 		| IDENT
+		{
+			$$ = (ExpressionNode *) $1;
+		}
 		| VALUE;
 
 VALUE		: INT | STR | ARRAY | OBJECT

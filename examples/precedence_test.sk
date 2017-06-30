@@ -1,0 +1,29 @@
+
+
+var a = 2 + 2 * 3
+print("should be 8: " + a)
+
+a = 2 * 3 + 2
+print("should be 8: " + a)
+
+a = (2 + 2) * 3
+print("should be 12: " + a)
+
+a = (2 + 2) * 3
+print("should be 12: " + a)
+
+a = 4 / 2 * 3
+print("should be 6: " + a)
+
+a = 0 && 1 || 1
+print("should be 1:" + a)
+
+a = 1 || 1 && 0
+print("should be 1:" + a)
+
+a = !(1 && !1)
+print("should be 1:" + a)
+
+
+a = -1 * 45
+print("should be -45:" + a)

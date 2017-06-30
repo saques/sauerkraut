@@ -1,0 +1,5 @@
+var a = (!0).toString()
+print("Deberia ser 1:" + a)
+
+a = !1.toString()
+print("Deberia ser 0:" + a)

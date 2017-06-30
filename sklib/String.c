@@ -17,15 +17,29 @@ static Class * sClass = NULL;
 /*
  * METHODS FOR String
  */
-const static int NMETHODS = 9;
+const static int NMETHODS = 10;
 
 bool isnumber(const char * s) {
 		while (*s != 0 && *s == ' ') s++;
-		if (*s == 0 || ((*s<'0' || *s>'9') && *s!='.') ) {
+		if (*s == 0) {
+			return false;
+		}
+		if (*s == '.') {
+			s++;
+			while (*s != 0 && *s >= '0' && *s<= '9') s++;
+			if (*s == 0) {
+				return true;
+			}
+			return false;
+		}
+		if (*s<'0' || *s>'9') {
 			return false;
 		}
 		while (*s != 0 && *s >= '0' && *s<= '9') s++;
-		if (*s != 0 && *s != '.') {
+		if (*s == 0) return true;
+		if (*s != '.') {
+			while (*s != 0 && *s == ' ') s++;
+			if (*s == 0) return true;
 			return false;
 		}
 		*s++;
@@ -195,6 +209,19 @@ Object * Strgreater(void * obj, void ** args, int nArgs){
 	return newObject(newInteger(strcmp(this->s,other->s)>0),integerClass());
 }
 
+Object * notString(void * obj, void ** args, int nArgs){
+	if(nArgs!=0){
+		errorout("String::not expects 0 arguments");
+		exit(1);
+	}
+	Object * o = toIntString(obj, args, nArgs);
+	if (o == NULL) {
+		return NULL;
+	}
+	Integer * i = (Integer * ) o->instance;
+	i->i = !i->i;
+	return o;
+}
 /*
  * END METHODS FOR String
  */
@@ -217,6 +244,7 @@ Class * stringClass(){
 	sClass->methods[6] = newObject(newMethod((function)stringLength,"length"),methodClass());
 	sClass->methods[7] = newObject(newMethod((function)getString,"get"),methodClass());
 	sClass->methods[8] = newObject(newMethod((function)setString,"set"),methodClass());
+	sClass->methods[9] = newObject(newMethod((function)notString,"not"),methodClass());
 	return sClass;
 }
 

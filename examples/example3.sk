@@ -1,5 +1,5 @@
 var a = 2 + 2 + 2
 
-print(a)
-a = 12-3
-print(a)
+var b = 45
+
+print(a + b)
