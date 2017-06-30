@@ -69,10 +69,10 @@ S		: ST
 		}
 		;
 
-ST		: EXPR ST
+ST		: EXPR DELIM ST
 		{
-			$$ = $2;
-			$2->statements.push_front($<st>1);
+			$$ = $3;
+			$3->statements.push_front($<st>1);
 		}
 		| EXTERN_FUNC ST
 		{
@@ -84,10 +84,10 @@ ST		: EXPR ST
 			$$ = $2;
 			$2->statements.push_front($<st>1);
 		}
-		| VAR ST
+		| VAR DELIM ST
 		{
-			$$ = $2;
-			$2->statements.push_front($<st>1);
+			$$ = $3;
+			$3->statements.push_front($<st>1);
 		}
 		| IF ST
 		{
@@ -100,7 +100,7 @@ ST		: EXPR ST
 			$$ = $2;
 			$2->statements.push_front($<st>1);
 		}
-		| RET
+		| RET DELIM
 		{
 			$$ = new BlockNode();
 			$$->statements.push_front($<st>1);
@@ -109,6 +109,10 @@ ST		: EXPR ST
 		{
 			$$ = new BlockNode();
 		}
+		;
+
+DELIM	:	';'
+		|
 		;
 
 RET		: RETKW I
