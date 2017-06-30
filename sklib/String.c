@@ -145,6 +145,10 @@ Object * setString(void * obj, void ** args, int nArgs){
 		exit(1);
 	}
 	char * dup = strdup(str->s);
+	if (dup == NULL) {
+		errorout("Memory error expects 1 arguments");
+		exit(1);
+	}
 	dup[index->i] = value->s[0];
 	free((void*) str->s);
 	str->s = dup;
@@ -219,6 +223,10 @@ Class * stringClass(){
 String * newString(const char * s){
 	String * ans = (String *)malloc(sizeof(String));
 	char * c_string = strdup(s);
+	if (c_string == NULL) {
+		errorout("Memory error");
+		exit(1);
+	}
 	ans->s=c_string;
 	ans->len = strlen(c_string);
 	return ans;

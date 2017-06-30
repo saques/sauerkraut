@@ -3,14 +3,14 @@ function partition(arr, lo, hi) {
 	var i = lo - 1
 
 	var j = lo
+	var temp
 	while (j <= hi) {
 		if (arr.get(j) <= pivot) {
 			i = i + 1
 			if (i != j) {
-				var temp = arr.get(i)
+				temp = arr.get(i)
 				arr.set(i, arr.get(j))
 				arr.set(j, temp)
-
 			}
 		}
 		j = j + 1
@@ -28,12 +28,12 @@ function quicksort(arr, lo, hi) {
 }
 
 var arr = []
-var i = 10
+var i = 1000
 while (i > 0) {
 	arr + i
 	i = i - 1
 }
-print(arr)
+
 
 quicksort(arr, 0, arr.size() - 1)
 print(arr)

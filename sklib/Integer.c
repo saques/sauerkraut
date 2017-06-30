@@ -26,7 +26,9 @@ Object * toStringInteger(void * obj, void ** args, int nArgs){
 	Integer * this = (Integer *)(((Object *)obj)->instance);
 	char * s = malloc(BUFSIZE);
 	snprintf(s,BUFSIZE,"%ld",this->i);
-	return newObject(newString(s),stringClass());
+	Object * ret =  newObject(newString(s),stringClass());
+	free(s);
+	return ret;
 }
 
 Object * toIntInteger(void * obj, void ** args, int nArgs){
