@@ -27,5 +27,7 @@
 		incluyendo una implementación de fibonacci(n) programado dinámicamente.
 		- En examples/error/ se encontrarán ejemplos de casos que deben fallar, 
 		incluyendo un caso en el que se intenta invocar un método inexistente sobre un objeto.
+		- En examples/algorithms/ se encontrarán algunos algoritmos de prueba y un pequeño
+		programa que crea un registro de usuarios, entre otros programas.
 		- Asimismo, en examples/ hay una implementación de quicksort en Sauerkraut.
 		
